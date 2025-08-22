@@ -1,0 +1,123 @@
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:get/get.dart';
+import 'package:reachify_app/configuration/network_config.dart';
+import 'package:reachify_app/models/banner_model.dart';
+import 'package:reachify_app/models/category_model.dart';
+import 'package:reachify_app/utils/const/logger.dart';
+import 'package:reachify_app/utils/const/url_const.dart';
+import 'package:reachify_app/configuration/user_config.dart';
+import 'package:reachify_app/routes/app_routes.dart';
+import 'package:reachify_app/utils/const/asset_const.dart';
+import 'package:reachify_app/utils/functions/app_func.dart';
+
+class HomeCtrl extends GetxController {
+  @override
+  void onInit() {
+    // TODO: implement onInit
+    super.onInit();
+    initCall();
+  }
+
+  Future<void> initCall() async {
+    await getBanners();
+    await getHomeData();
+  }
+
+  final CarouselSliderController controller = CarouselSliderController();
+
+  // final List<String> images = [
+  //   'https://picsum.photos/id/237/400/200',
+  //   'https://picsum.photos/id/239/400/200',
+  //   'https://picsum.photos/id/240/400/200',
+  //   'https://picsum.photos/id/241/400/200',
+  //   'https://picsum.photos/id/242/400/200',
+  // ];
+  RxList<BannerModel> bannerList = <BannerModel>[].obs;
+  RxList<CategoryModel> homeList = <CategoryModel>[].obs;
+  RxInt activeIndex = 0.obs;
+  RxBool gettingBanner = true.obs;
+  RxBool otherData = true.obs;
+
+  Future<void> getBanners() async {
+    try {
+      gettingBanner(true);
+      final response = await net.get(url: UrlConst.getBanners, params: {});
+      if (net.successfulRes(response: response)) {
+        final List<dynamic> data = response.data;
+        final List<BannerModel> elements = data
+            .map((json) => BannerModel.fromJson(json))
+            .toList();
+        bannerList(elements);
+        logger.d(bannerList.length);
+      } else {
+        logger.e(response);
+      }
+      gettingBanner(false);
+    } catch (e, t) {
+      logger.e('$e\n$t');
+      gettingBanner(false);
+    }
+  }
+
+  Future<void> getHomeData() async {
+    try {
+      otherData(true);
+      final response = await net.get(url: UrlConst.getHomeProduct, params: {});
+      if (net.successfulRes(response: response)) {
+        final List<dynamic> data = response.data;
+        final List<CategoryModel> elements = data
+            .map((json) => CategoryModel.fromJson(json))
+            .toList();
+        homeList(elements);
+        logger.d(homeList.length);
+      } else {
+        logger.e(response);
+      }
+      otherData(false);
+    } catch (e, t) {
+      logger.e('$e\n$t');
+      otherData(false);
+    }
+  }
+
+  @override
+  void onReady() {
+    // TODO: implement onReady
+    super.onReady();
+    openDialogue();
+  }
+
+  Future<void> openDialogue() async {
+    if (user.appUser.businessName.isEmpty) {
+      await AppFunc.appPopUp(
+        title: 'Verify Profile',
+        desc: 'Submit Valid Visiting Card or GST to Verify Your Profile.',
+        assetName: AssetConst.person,
+        buttonName: 'Edit Profile',
+        buttonTap: () {
+          Get.back();
+          Get.toNamed(AppRoutes.createAcc);
+        },
+      );
+    } else if (user.appUser.isVerify != 1) {
+      await AppFunc.appPopUp(
+        title: 'Your Profile Verified Soon',
+        desc: 'Please Wait For Some Time, We Notified You Soon...',
+        assetName: AssetConst.pending,
+        buttonName: 'Ok',
+        buttonTap: () {
+          Get.back();
+        },
+      );
+    }
+    // AppFunc.appPopUp(
+    //   title: 'Your Profile is Now Verified',
+    //   desc: "Thanks for verifying. You're ready to explore everything.",
+    //   assetName: AssetConst.verified,
+    //   buttonName: 'Explore App',
+    //   buttonTap: () {
+    //     Get.back();
+    //   },
+    // );
+  }
+}

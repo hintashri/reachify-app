@@ -1,0 +1,213 @@
+import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/material.dart';
+import 'package:get/get.dart';
+import 'package:reachify_app/models/product_model.dart';
+import 'package:reachify_app/modules/home/home_ctrl.dart';
+import 'package:reachify_app/theme/app_colors.dart';
+import 'package:reachify_app/theme/app_theme.dart';
+import 'package:reachify_app/utils/const/url_const.dart';
+import 'package:reachify_app/utils/widgets/cache_image.dart';
+import 'package:reachify_app/utils/widgets/empty_view.dart';
+import 'package:reachify_app/utils/widgets/loading_view.dart';
+import 'package:smooth_page_indicator/smooth_page_indicator.dart';
+
+class HomeScreen extends StatelessWidget {
+  final HomeCtrl c = Get.put(HomeCtrl());
+
+  HomeScreen({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return SafeArea(
+      child: Obx(() {
+        if (c.gettingBanner()) {
+          return const LoaderView();
+        } else {
+          return SingleChildScrollView(
+            child: Column(
+              children: [
+                Obx(() {
+                  if (c.bannerList.isNotEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 15),
+                      child: CarouselSlider.builder(
+                        carouselController: c.controller,
+                        itemCount: c.bannerList.length,
+                        itemBuilder: (context, index, realIndex) {
+                          return CacheImage(
+                            url:
+                                '${UrlConst.baseUrl}/storage/app/public/banner/${c.bannerList[index].photo}',
+                            fit: BoxFit.cover,
+                            width: double.infinity,
+                          );
+                        },
+                        options: CarouselOptions(
+                          height: 200,
+                          autoPlay: true,
+                          viewportFraction: 1,
+                          enlargeCenterPage: false,
+                          onPageChanged: (index, reason) =>
+                              c.activeIndex(index),
+                        ),
+                      ),
+                    );
+                  } else {
+                    return const SizedBox();
+                  }
+                }),
+                Obx(() {
+                  if (c.bannerList.isNotEmpty) {
+                    return Padding(
+                      padding: const EdgeInsets.only(top: 10),
+                      child: AnimatedSmoothIndicator(
+                        activeIndex: c.activeIndex(),
+                        count: c.bannerList.length,
+                        effect: const WormEffect(
+                          dotHeight: 8,
+                          dotWidth: 8,
+                          spacing: 6,
+                          dotColor: Color(0xFFe0e0e0),
+                          // inactive
+                          activeDotColor: AppColors.primary,
+                        ),
+                        onDotClicked: (index) =>
+                            c.controller.animateToPage(index),
+                      ),
+                    );
+                  } else {
+                    return const SizedBox();
+                  }
+                }),
+                // const SizedBox(height: 10),
+                Obx(() {
+                  if (c.homeList.isNotEmpty) {
+                    return ListView.builder(
+                      padding: const EdgeInsets.only(bottom: 50, top: 10),
+                      itemCount: c.homeList.length,
+                      shrinkWrap: true,
+                      physics: const NeverScrollableScrollPhysics(),
+                      itemBuilder: (context, index) {
+                        final model = c.homeList[index];
+                        if (model.products.isNotEmpty) {
+                          return Column(
+                            crossAxisAlignment: CrossAxisAlignment.stretch,
+                            mainAxisSize: MainAxisSize.min,
+                            children: [
+                              CustomTitleRow(title: model.name, onPress: () {}),
+                              CustomListView(
+                                products: model.products.length <= 10
+                                    ? model.products
+                                    : model.products.take(10).toList(),
+                              ),
+                            ],
+                          );
+                        } else {
+                          return const SizedBox();
+                        }
+                      },
+                    );
+                  } else {
+                    return const EmptyView();
+                  }
+                }),
+              ],
+            ),
+          );
+        }
+      }),
+    );
+  }
+}
+
+class CustomListView extends StatelessWidget {
+  final List<ProductModel> products;
+  final HomeCtrl c = Get.find<HomeCtrl>();
+
+  CustomListView({super.key, required this.products});
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 120,
+      child: ListView.separated(
+        scrollDirection: Axis.horizontal,
+        itemCount: products.length,
+        padding: const EdgeInsets.symmetric(horizontal: 8),
+        separatorBuilder: (context, index) {
+          return const SizedBox(width: 12);
+        },
+        itemBuilder: (context, index) {
+          final model = products[index];
+          return ClipRRect(
+            clipBehavior: Clip.antiAlias,
+            borderRadius: BorderRadius.circular(12),
+            child: CacheImage(
+              url:
+                  '${UrlConst.baseUrl}/storage/app/public/product/${model.images.first}',
+              height: 120,
+              width: 120,
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+
+class CustomTitleRow extends StatelessWidget {
+  final String title;
+  final void Function()? onPress;
+
+  const CustomTitleRow({super.key, required this.title, this.onPress});
+
+  @override
+  Widget build(BuildContext context) {
+    return Padding(
+      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 7),
+      child: Row(
+        spacing: 12,
+        children: [
+          Expanded(
+            child: Text(
+              title,
+              maxLines: 1,
+              overflow: TextOverflow.ellipsis,
+              softWrap: true,
+              style: context.textTheme.bodyMedium?.copyWith(
+                fontWeight: FontWeight.bold,
+                color: AppColors.textDark,
+              ),
+            ),
+          ),
+          TextButton(
+            onPressed: onPress,
+            style: TextButton.styleFrom(
+              padding: EdgeInsets.zero,
+              tapTargetSize: MaterialTapTargetSize.shrinkWrap,
+              visualDensity: VisualDensity.compact,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(8),
+              ),
+            ),
+            child: ShaderMask(
+              shaderCallback: (bounds) => AppTheme.gradient.createShader(
+                Rect.fromLTWH(0, 0, bounds.width, bounds.height),
+              ),
+              child: Text(
+                'See All',
+                style: context.textTheme.bodySmall?.copyWith(
+                  decoration: TextDecoration.underline,
+                  decorationStyle: TextDecorationStyle.solid,
+                  decorationColor: AppColors.primary,
+                  fontSize: 11,
+                  fontWeight: FontWeight.w500,
+                  color: Colors.white,
+                ),
+              ),
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+}
