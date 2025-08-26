@@ -20,4 +20,6 @@ class UrlConst {
   //   HOME GETS
   static const getBanners = '$baseUrl/api/v1/banners';
   static const getHomeProduct = '$baseUrl/api/v1/products/home-categories';
+  static const getProducts = '$baseUrl/api/v1/categories/products';
+  static const getProCategories = '$baseUrl/api/v1/categories/subcategory';
 }

@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reachify_app/models/product_model.dart';
 import 'package:reachify_app/modules/home/home_ctrl.dart';
+import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/theme/app_theme.dart';
 import 'package:reachify_app/utils/const/url_const.dart';
@@ -93,7 +94,12 @@ class HomeScreen extends StatelessWidget {
                             crossAxisAlignment: CrossAxisAlignment.stretch,
                             mainAxisSize: MainAxisSize.min,
                             children: [
-                              CustomTitleRow(title: model.name, onPress: () {}),
+                              CustomTitleRow(
+                                title: model.name,
+                                onPress: () {
+                                  Get.toNamed(AppRoutes.categoryScreen);
+                                },
+                              ),
                               CustomListView(
                                 products: model.products.length <= 10
                                     ? model.products
@@ -107,7 +113,10 @@ class HomeScreen extends StatelessWidget {
                       },
                     );
                   } else {
-                    return const EmptyView();
+                    return const Padding(
+                      padding: EdgeInsets.only(top: 50),
+                      child: EmptyView(),
+                    );
                   }
                 }),
               ],

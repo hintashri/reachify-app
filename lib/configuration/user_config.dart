@@ -1,4 +1,5 @@
 import 'package:get/get.dart' hide Response;
+import 'package:reachify_app/configuration/init_config.dart';
 import 'package:reachify_app/configuration/pref_config.dart';
 import 'package:reachify_app/models/user_model.dart';
 import 'package:reachify_app/routes/app_routes.dart';
@@ -62,6 +63,7 @@ class UserConfig {
       if (user.id != 0) {
         user.token = s;
         setUser(user);
+        await init.getBusinessType();
         Get.offAllNamed(AppRoutes.home);
       } else {
         logoutUser();

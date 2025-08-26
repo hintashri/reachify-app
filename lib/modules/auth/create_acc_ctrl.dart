@@ -2,6 +2,7 @@ import 'dart:convert';
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response, MultipartFile;
+import 'package:reachify_app/configuration/init_config.dart';
 import 'package:reachify_app/configuration/network_config.dart';
 import 'package:reachify_app/models/category_model.dart';
 import 'package:reachify_app/models/city_model.dart';
@@ -24,7 +25,6 @@ class CreateAccCtrl extends GetxController {
   RxBool initLoading = true.obs;
   RxBool fromAuth = false.obs;
   List<CityModel> cityList = <CityModel>[];
-  List<CategoryModel> bTypeList = <CategoryModel>[];
   Rx<String> filePath = ''.obs;
 
   @override
@@ -84,8 +84,7 @@ class CreateAccCtrl extends GetxController {
 
   Future<void> initCall() async {
     await getCity();
-    await getBusinessType();
-    if (cityList.isNotEmpty && bTypeList.isNotEmpty) {
+    if (cityList.isNotEmpty && init.bTypeList.isNotEmpty) {
       initLoading(false);
     }
   }
@@ -105,25 +104,6 @@ class CreateAccCtrl extends GetxController {
         cityList = elements;
         cityList.sort((a, b) => a.name.compareTo(b.name));
         logger.d(cityList.length);
-      } else {
-        logger.e(response);
-      }
-    } catch (e, t) {
-      logger.e('$e\n$t');
-    }
-  }
-
-  Future<void> getBusinessType() async {
-    try {
-      final response = await net.get(url: UrlConst.getBusinessType, params: {});
-      if (net.successfulRes(response: response)) {
-        // final jsonData = jsonDecode(response.data);
-        final List<dynamic> data = response.data;
-        final List<CategoryModel> elements = data
-            .map((json) => CategoryModel.fromJson(json))
-            .toList();
-        bTypeList = elements;
-        logger.d(bTypeList.length);
       } else {
         logger.e(response);
       }

@@ -2,7 +2,9 @@ import 'package:get/get.dart';
 import 'package:reachify_app/modules/auth/otp_screen.dart';
 import 'package:reachify_app/modules/auth/mobile_no_screen.dart';
 import 'package:reachify_app/modules/auth/create_acc_screen.dart';
+import 'package:reachify_app/modules/products/category_screen.dart';
 import 'package:reachify_app/modules/home/init_home_screen.dart';
+import 'package:reachify_app/modules/profile/profile_screen.dart';
 import 'package:reachify_app/modules/splash/splash_screen.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 
@@ -21,11 +23,7 @@ class AppPages {
       page: () => MobileNoScreen(),
       transition: swipeUp,
     ),
-    GetPage(
-      name: AppRoutes.otp,
-      page: () => OtpScreen(),
-      transition: swipeUp,
-    ),
+    GetPage(name: AppRoutes.otp, page: () => OtpScreen(), transition: swipeUp),
     GetPage(
       name: AppRoutes.createAcc,
       page: () => CreateAccScreen(),
@@ -35,6 +33,16 @@ class AppPages {
       name: AppRoutes.home,
       page: () => InitHomeScreen(),
       transition: swipeUp,
+    ),
+    GetPage(
+      name: AppRoutes.profile,
+      page: () => const ProfileScreen(),
+      transition: rightLeft,
+    ),
+    GetPage(
+      name: AppRoutes.categoryScreen,
+      page: () => CategoryScreen(),
+      transition: rightLeft,
     ),
   ];
 }

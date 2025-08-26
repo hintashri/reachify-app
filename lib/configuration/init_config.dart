@@ -7,13 +7,17 @@ import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:get_storage/get_storage.dart';
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:reachify_app/configuration/network_config.dart';
+import 'package:reachify_app/models/category_model.dart';
 import 'package:reachify_app/utils/const/logger.dart';
+import 'package:reachify_app/utils/const/url_const.dart';
 import 'package:reachify_app/utils/functions/app_func.dart';
 
 final InitConfig init = InitConfig.instance;
 
 class InitConfig extends GetxService {
   static final InitConfig instance = InitConfig();
+  List<CategoryModel> bTypeList = <CategoryModel>[];
 
   Future<void> initCall() async {
     WidgetsFlutterBinding.ensureInitialized();
@@ -110,4 +114,25 @@ class InitConfig extends GetxService {
       logger.e('$e\n$t');
     }
   }
+
+
+  Future<void> getBusinessType() async {
+    try {
+      final response = await net.get(url: UrlConst.getBusinessType, params: {});
+      if (net.successfulRes(response: response)) {
+        // final jsonData = jsonDecode(response.data);
+        final List<dynamic> data = response.data;
+        final List<CategoryModel> elements = data
+            .map((json) => CategoryModel.fromJson(json))
+            .toList();
+        init.bTypeList = elements;
+        logger.d(init.bTypeList.length);
+      } else {
+        logger.e(response);
+      }
+    } catch (e, t) {
+      logger.e('$e\n$t');
+    }
+  }
+
 }

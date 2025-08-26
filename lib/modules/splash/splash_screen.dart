@@ -1,9 +1,15 @@
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response;
+import 'package:reachify_app/configuration/init_config.dart';
+import 'package:reachify_app/configuration/network_config.dart';
 import 'package:reachify_app/configuration/user_config.dart';
+import 'package:reachify_app/models/category_model.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
+import 'package:reachify_app/utils/const/url_const.dart';
+
+import '../../utils/const/logger.dart';
 
 class SplashScreen extends StatelessWidget {
   SplashScreen({super.key});
@@ -51,4 +57,5 @@ class SplashCtrl extends GetxController {
     await 3.delay();
     await user.getCurrentUser();
   }
+
 }
