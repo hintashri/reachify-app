@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:reachify_app/configuration/init_config.dart';
 import 'package:reachify_app/modules/products/category_ctrl.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/utils/const/logger.dart';
@@ -18,6 +17,8 @@ class CategoryScreen extends StatefulWidget {
 
 class _CategoryScreenState extends State<CategoryScreen>
     with SingleTickerProviderStateMixin {
+  late TabController tabCtrl;
+
   @override
   void initState() {
     // TODO: implement initState
@@ -28,18 +29,19 @@ class _CategoryScreenState extends State<CategoryScreen>
   Future<void> initCall() async {
     await c.getCategories();
     c.initLoading(false);
-    c.tabCtrl = TabController(length: c.categoryList.length, vsync: this);
+    tabCtrl = TabController(length: c.categoryList.length, vsync: this);
     final int firstId = c.categoryList.elementAt(0).id;
     c.getProducts(categoryId: firstId);
-    c.tabCtrl.addListener(() {
-      final int id = c.categoryList.elementAt(c.tabCtrl.index).id;
+    tabCtrl.addListener(() {
+      logger.d('Called IT Finally');
+      final int id = c.categoryList.elementAt(tabCtrl.index).id;
       c.getProducts(categoryId: id);
     });
   }
 
   @override
   void dispose() {
-    c.tabCtrl.dispose();
+    tabCtrl.dispose();
     super.dispose();
   }
 
@@ -62,7 +64,7 @@ class _CategoryScreenState extends State<CategoryScreen>
             child: Column(
               children: [
                 TabBar(
-                  controller: c.tabCtrl,
+                  controller: tabCtrl,
                   physics: const BouncingScrollPhysics(),
                   dividerHeight: 0,
                   indicatorSize: TabBarIndicatorSize.tab,
@@ -85,6 +87,7 @@ class _CategoryScreenState extends State<CategoryScreen>
                 ),
                 Expanded(
                   child: TabBarView(
+                    controller: tabCtrl,
                     children: c.categoryList.map((e) => ProductGrid()).toList(),
                   ),
                 ),

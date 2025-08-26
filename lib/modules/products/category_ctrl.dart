@@ -1,17 +1,16 @@
-import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reachify_app/configuration/init_config.dart';
 import 'package:reachify_app/configuration/user_config.dart';
 import 'package:reachify_app/models/category_model.dart';
 import 'package:reachify_app/models/product_model.dart';
 import 'package:reachify_app/utils/const/url_const.dart';
+
 import '../../configuration/network_config.dart';
 import '../../utils/const/logger.dart';
 
 class CategoryCtrl extends GetxController {
   RxBool initLoading = true.obs;
   RxBool proLoading = true.obs;
-  late TabController tabCtrl;
   List<ProductModel> productList = <ProductModel>[];
   List<CategoryModel> categoryList = <CategoryModel>[];
 
