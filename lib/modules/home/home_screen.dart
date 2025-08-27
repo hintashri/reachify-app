@@ -1,3 +1,5 @@
+import 'dart:async';
+
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -7,6 +9,7 @@ import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/theme/app_theme.dart';
 import 'package:reachify_app/utils/const/url_const.dart';
+import 'package:reachify_app/utils/widgets/auth_textfield.dart';
 import 'package:reachify_app/utils/widgets/cache_image.dart';
 import 'package:reachify_app/utils/widgets/empty_view.dart';
 import 'package:reachify_app/utils/widgets/loading_view.dart';
@@ -20,6 +23,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return SafeArea(
+      bottom: false,
       child: Obx(() {
         if (c.gettingBanner()) {
           return const LoaderView();
@@ -28,94 +32,196 @@ class HomeScreen extends StatelessWidget {
             child: Column(
               children: [
                 Obx(() {
-                  if (c.bannerList.isNotEmpty) {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 15),
-                      child: CarouselSlider.builder(
-                        carouselController: c.controller,
-                        itemCount: c.bannerList.length,
-                        itemBuilder: (context, index, realIndex) {
-                          return CacheImage(
-                            url:
-                                '${UrlConst.baseUrl}/storage/app/public/banner/${c.bannerList[index].photo}',
-                            fit: BoxFit.cover,
-                            width: double.infinity,
-                          );
-                        },
-                        options: CarouselOptions(
-                          height: 200,
-                          autoPlay: true,
-                          viewportFraction: 1,
-                          enlargeCenterPage: false,
-                          onPageChanged: (index, reason) =>
-                              c.activeIndex(index),
+                  return Visibility(
+                    visible: c.initHomeCtrl.activeTab() == 2,
+                    child: SlideTransition(
+                      position: c.searchOffset,
+                      child: Padding(
+                        padding: const EdgeInsets.symmetric(horizontal: 16),
+                        child: AuthTextField(
+                          controller: c.searchCTRL,
+                          prefixIcon: const Icon(Icons.search),
+                          hintText: 'Search products',
+                          textInputType: TextInputType.text,
+                          textInputAction: TextInputAction.done,
+                          onChange: (newValue) {
+                            if (c.debounce?.isActive ?? false) {
+                              c.debounce?.cancel();
+                            }
+                            c.debounce = Timer(
+                              const Duration(milliseconds: 500),
+                              () {
+                                c.search(newValue);
+                              },
+                            );
+                          },
                         ),
                       ),
-                    );
-                  } else {
-                    return const SizedBox();
-                  }
+                    ),
+                  );
                 }),
                 Obx(() {
-                  if (c.bannerList.isNotEmpty) {
-                    return Padding(
-                      padding: const EdgeInsets.only(top: 10),
-                      child: AnimatedSmoothIndicator(
-                        activeIndex: c.activeIndex(),
-                        count: c.bannerList.length,
-                        effect: const WormEffect(
-                          dotHeight: 8,
-                          dotWidth: 8,
-                          spacing: 6,
-                          dotColor: Color(0xFFe0e0e0),
-                          // inactive
-                          activeDotColor: AppColors.primary,
+                  if (c.isLoading.isTrue) {
+                    return SizedBox(
+                      height: context.height * 0.6,
+                      child: const LoaderView(),
+                    );
+                  }
+                  if (c.searchParam.isNotEmpty &&
+                      c.initHomeCtrl.activeTab() == 2) {
+                    if (c.isSearching.isTrue) {
+                      return SizedBox(
+                        height: context.height * 0.6,
+                        child: const LoaderView(),
+                      );
+                    }
+                    return Column(
+                      crossAxisAlignment: CrossAxisAlignment.start,
+                      children: [
+                        Padding(
+                          padding: const EdgeInsets.symmetric(
+                            horizontal: 16,
+                            vertical: 10,
+                          ),
+                          child: Text(
+                            'Found ${c.searchList.length} results for "${c.searchParam.value}"',
+                            style: TextStyle(
+                              color: Colors.grey.shade600,
+                              fontSize: 14,
+                            ),
+                          ),
                         ),
-                        onDotClicked: (index) =>
-                            c.controller.animateToPage(index),
-                      ),
+                        GridView.builder(
+                          padding: const EdgeInsets.fromLTRB(16, 0, 16, 10),
+                          gridDelegate:
+                              const SliverGridDelegateWithFixedCrossAxisCount(
+                                crossAxisCount: 2,
+                                childAspectRatio: 1,
+                                mainAxisSpacing: 10,
+                                crossAxisSpacing: 10,
+                              ),
+                          physics: const NeverScrollableScrollPhysics(),
+                          itemCount: c.searchList.length,
+                          shrinkWrap: true,
+                          itemBuilder: (context, index) {
+                            final model = c.searchList[index];
+                            return ClipRRect(
+                              clipBehavior: Clip.antiAlias,
+                              borderRadius: BorderRadius.circular(12),
+                              child: CacheImage(
+                                url:
+                                    '${UrlConst.baseUrl}/storage/app/public/product/${model.images.first}',
+                                height: 120,
+                                width: 120,
+                              ),
+                            );
+                          },
+                        ),
+                      ],
                     );
                   } else {
-                    return const SizedBox();
-                  }
-                }),
-                // const SizedBox(height: 10),
-                Obx(() {
-                  if (c.homeList.isNotEmpty) {
-                    return ListView.builder(
-                      padding: const EdgeInsets.only(bottom: 50, top: 10),
-                      itemCount: c.homeList.length,
-                      shrinkWrap: true,
-                      physics: const NeverScrollableScrollPhysics(),
-                      itemBuilder: (context, index) {
-                        final model = c.homeList[index];
-                        if (model.products.isNotEmpty) {
-                          return Column(
-                            crossAxisAlignment: CrossAxisAlignment.stretch,
-                            mainAxisSize: MainAxisSize.min,
-                            children: [
-                              CustomTitleRow(
-                                title: model.name,
-                                onPress: () {
-                                  Get.toNamed(AppRoutes.categoryScreen);
+                    return Column(
+                      children: [
+                        Obx(() {
+                          if (c.bannerList.isNotEmpty) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 15),
+                              child: CarouselSlider.builder(
+                                carouselController: c.controller,
+                                itemCount: c.bannerList.length,
+                                itemBuilder: (context, index, realIndex) {
+                                  return CacheImage(
+                                    url:
+                                        '${UrlConst.baseUrl}/storage/app/public/banner/${c.bannerList[index].photo}',
+                                    fit: BoxFit.cover,
+                                    width: double.infinity,
+                                  );
                                 },
+                                options: CarouselOptions(
+                                  height: 200,
+                                  autoPlay: true,
+                                  viewportFraction: 1,
+                                  enlargeCenterPage: false,
+                                  onPageChanged: (index, reason) =>
+                                      c.activeIndex(index),
+                                ),
                               ),
-                              CustomListView(
-                                products: model.products.length <= 10
-                                    ? model.products
-                                    : model.products.take(10).toList(),
+                            );
+                          } else {
+                            return const SizedBox();
+                          }
+                        }),
+                        Obx(() {
+                          if (c.bannerList.isNotEmpty) {
+                            return Padding(
+                              padding: const EdgeInsets.only(top: 10),
+                              child: AnimatedSmoothIndicator(
+                                activeIndex: c.activeIndex(),
+                                count: c.bannerList.length,
+                                effect: const WormEffect(
+                                  dotHeight: 8,
+                                  dotWidth: 8,
+                                  spacing: 6,
+                                  dotColor: Color(0xFFe0e0e0),
+                                  // inactive
+                                  activeDotColor: AppColors.primary,
+                                ),
+                                onDotClicked: (index) =>
+                                    c.controller.animateToPage(index),
                               ),
-                            ],
-                          );
-                        } else {
-                          return const SizedBox();
-                        }
-                      },
-                    );
-                  } else {
-                    return const Padding(
-                      padding: EdgeInsets.only(top: 50),
-                      child: EmptyView(),
+                            );
+                          } else {
+                            return const SizedBox();
+                          }
+                        }),
+                        // const SizedBox(height: 10),
+                        Obx(() {
+                          if (c.homeList.isNotEmpty) {
+                            return ListView.builder(
+                              padding: const EdgeInsets.only(
+                                bottom: 50,
+                                top: 10,
+                              ),
+                              itemCount: c.homeList.length,
+                              shrinkWrap: true,
+                              physics: const NeverScrollableScrollPhysics(),
+                              itemBuilder: (context, index) {
+                                final model = c.homeList[index];
+                                if (model.products.isNotEmpty) {
+                                  return Column(
+                                    crossAxisAlignment:
+                                        CrossAxisAlignment.stretch,
+                                    mainAxisSize: MainAxisSize.min,
+                                    children: [
+                                      CustomTitleRow(
+                                        title: model.name,
+                                        onPress: () {
+                                          Get.toNamed(
+                                            AppRoutes.categoryScreen,
+                                            arguments: model.id,
+                                          );
+                                        },
+                                      ),
+                                      CustomListView(
+                                        products: model.products.length <= 10
+                                            ? model.products
+                                            : model.products.take(10).toList(),
+                                      ),
+                                    ],
+                                  );
+                                } else {
+                                  return const SizedBox();
+                                }
+                              },
+                            );
+                          } else {
+                            return const Padding(
+                              padding: EdgeInsets.only(top: 50),
+                              child: EmptyView(),
+                            );
+                          }
+                        }),
+                      ],
                     );
                   }
                 }),

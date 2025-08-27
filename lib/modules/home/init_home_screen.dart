@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
-import 'package:reachify_app/modules/home/init_home_ctrl.dart';
 import 'package:reachify_app/modules/home/home_screen.dart';
+import 'package:reachify_app/modules/home/init_home_ctrl.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
 import 'package:reachify_app/utils/widgets/buttons/nav_bar_button.dart';
@@ -54,18 +54,26 @@ class InitHomeScreen extends StatelessWidget {
                 child: Row(
                   mainAxisAlignment: MainAxisAlignment.spaceAround,
                   children: [
-                    const NavBarButton(assetName: AssetConst.home, index: 0),
+                    NavBarButton(
+                      assetName: AssetConst.home,
+                      index: 0,
+                      onTap: () {
+                        c.activeTab(0);
+                      },
+                    ),
                     NavBarButton(
                       assetName: AssetConst.like,
                       index: 1,
                       onTap: () {
-                        Get.toNamed(AppRoutes.wishlist);
+                        c.activeTab(1);
                       },
                     ),
                     NavBarButton(
                       assetName: AssetConst.search,
                       index: 2,
-                      onTap: () {},
+                      onTap: () {
+                        c.activeTab(2);
+                      },
                     ),
                     NavBarButton(
                       assetName: AssetConst.menu,

@@ -30,9 +30,7 @@ class AuthTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      onTapOutside: (event) {
-        FocusScope.of(context).unfocus();
-      },
+      onTapOutside: (event) => FocusScope.of(context).unfocus(),
       controller: controller,
       style: context.textTheme.labelMedium,
       validator: validator,

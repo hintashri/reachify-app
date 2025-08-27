@@ -1,30 +1,86 @@
+import 'dart:async';
+
 import 'package:carousel_slider/carousel_slider.dart';
+import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:reachify_app/configuration/network_config.dart';
+import 'package:reachify_app/configuration/user_config.dart';
 import 'package:reachify_app/models/banner_model.dart';
 import 'package:reachify_app/models/category_model.dart';
-import 'package:reachify_app/utils/const/logger.dart';
-import 'package:reachify_app/utils/const/url_const.dart';
-import 'package:reachify_app/configuration/user_config.dart';
+import 'package:reachify_app/models/product_model.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
+import 'package:reachify_app/utils/const/logger.dart';
+import 'package:reachify_app/utils/const/url_const.dart';
 import 'package:reachify_app/utils/functions/app_func.dart';
 
 import '../products/wishlist_ctrl.dart';
+import 'init_home_ctrl.dart';
 
-class HomeCtrl extends GetxController {
+class HomeCtrl extends GetxController with GetSingleTickerProviderStateMixin {
+  final InitHomeCtrl initHomeCtrl = Get.find<InitHomeCtrl>();
+  TextEditingController searchCTRL = TextEditingController();
+  Timer? debounce;
+  RxList<ProductModel> searchList = <ProductModel>[].obs;
+  RxString searchParam = ''.obs;
+
+  /// For search animation
+  late AnimationController searchController;
+  late Animation<Offset> searchOffset;
+
+  static const Duration animationDuration = Duration(milliseconds: 300);
+
+  static const Offset hiddenOffset = Offset(0.0, -1.0); // slide up hidden
+  static const Offset visibleOffset = Offset(0.0, 0.0);
+
   @override
   void onInit() {
-    // TODO: implement onInit
     super.onInit();
     initCall();
+    _initSearchAnimation();
+    searchActive();
+  }
+
+  void searchActive() {
+    initHomeCtrl.activeTab.listen((p0) {
+      if (p0 == 2) {
+        showSearch();
+      } else {
+        hideSearch();
+      }
+    });
+  }
+
+  void _initSearchAnimation() {
+    searchController = AnimationController(
+      duration: animationDuration,
+      vsync: this,
+    );
+    searchOffset = Tween<Offset>(begin: hiddenOffset, end: visibleOffset)
+        .animate(
+          CurvedAnimation(parent: searchController, curve: Curves.easeInOut),
+        );
+
+    searchController.value = 0.0; // hidden initially
+  }
+
+  void hideSearch() => searchController.reverse();
+
+  void showSearch() => searchController.forward();
+
+  @override
+  void onClose() {
+    debounce?.cancel();
+    searchController.dispose();
+    super.onClose();
   }
 
   final WishlistCtrl wishlistCtrl = Get.put(WishlistCtrl());
 
   Future<void> initCall() async {
-    await getBanners();
-    await getHomeData();
+    isLoading(true);
+    await Future.wait([getBanners(), getHomeData()]);
+    isLoading(false);
   }
 
   final CarouselSliderController controller = CarouselSliderController();
@@ -41,6 +97,8 @@ class HomeCtrl extends GetxController {
   RxInt activeIndex = 0.obs;
   RxBool gettingBanner = true.obs;
   RxBool otherData = true.obs;
+  RxBool isSearching = false.obs;
+  RxBool isLoading = false.obs;
 
   Future<void> getBanners() async {
     try {
@@ -81,6 +139,37 @@ class HomeCtrl extends GetxController {
     } catch (e, t) {
       logger.e('$e\n$t');
       otherData(false);
+    }
+  }
+
+  Future<void> search(String? param) async {
+    try {
+      searchParam(param);
+      if (param == null) return;
+      isSearching(true);
+      final response = await net.get(
+        url: UrlConst.getProductSearch,
+        params: {'search': param},
+      );
+      if (net.successfulRes(response: response)) {
+        if (response.data is List) {
+          final List<dynamic> data = response.data;
+          logger.d(data.map((e) => e.toString()).toList());
+          final List<ProductModel> elements = data
+              .map((json) => ProductModel.fromJson(json))
+              .toList();
+          searchList(elements);
+          logger.d(searchList.length);
+        } else {
+          searchList([]);
+        }
+      } else {
+        logger.e(response);
+      }
+      isSearching(false);
+    } catch (e, t) {
+      logger.e('$e\n$t');
+      isSearching(false);
     }
   }
 
