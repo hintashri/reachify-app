@@ -132,10 +132,7 @@ class CreateAccScreen extends StatelessWidget {
                     const SizedBox(height: 20),
                     CustomDropDownButton<String>(
                       list: c.cityList
-                          .map(
-                            (e) =>
-                                '${e.name}, ${e.stateName}, ${e.countryName}',
-                          )
+                          .map((e) => '${e.name}, ${e.stateName}')
                           .toList(),
                       value: c.cityVal,
                       onChanged: (value) {

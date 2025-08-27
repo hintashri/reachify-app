@@ -58,7 +58,9 @@ class InitHomeScreen extends StatelessWidget {
                     NavBarButton(
                       assetName: AssetConst.like,
                       index: 1,
-                      onTap: () {},
+                      onTap: () {
+                        Get.toNamed(AppRoutes.wishlist);
+                      },
                     ),
                     NavBarButton(
                       assetName: AssetConst.search,

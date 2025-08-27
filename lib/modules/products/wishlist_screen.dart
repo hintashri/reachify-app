@@ -14,7 +14,11 @@ class WishlistScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(leading: const AppBackButton()),
+      appBar: AppBar(
+        leading: const AppBackButton(),
+        centerTitle: true,
+        title: Text('Wishlist', style: context.textTheme.labelLarge),
+      ),
       body: Obx(() {
         if (c.initLoading()) {
           return const LoaderView();

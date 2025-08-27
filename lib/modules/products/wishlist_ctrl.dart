@@ -1,7 +1,4 @@
 import 'package:get/get.dart';
-import 'package:reachify_app/configuration/init_config.dart';
-import 'package:reachify_app/configuration/user_config.dart';
-import 'package:reachify_app/models/category_model.dart';
 import 'package:reachify_app/models/product_model.dart';
 import 'package:reachify_app/utils/const/url_const.dart';
 
