@@ -15,10 +15,12 @@ class CategoryCtrl extends GetxController {
   List<CategoryModel> categoryList = <CategoryModel>[];
 
   String get categoryName =>
-      init.bTypeList.where((e) => e.id == user.appUser.businessCategory).isEmpty
+      init.categoryList
+          .where((e) => e.id == user.appUser.selectedCategory)
+          .isEmpty
       ? ''
-      : init.bTypeList
-            .where((e) => e.id == user.appUser.businessCategory)
+      : init.categoryList
+            .where((e) => e.id == user.appUser.selectedCategory)
             .first
             .name;
 
@@ -34,7 +36,7 @@ class CategoryCtrl extends GetxController {
             .map((json) => CategoryModel.fromJson(json))
             .toList();
         categoryList = elements;
-        logger.d(categoryList.length);
+        // logger.d(categoryList.length);
       } else {
         logger.e(response);
       }
@@ -56,7 +58,7 @@ class CategoryCtrl extends GetxController {
             .map((json) => ProductModel.fromJson(json))
             .toList();
         productList = elements;
-        logger.d(productList.length);
+        // logger.d(productList.length);
       } else {
         logger.e(response);
       }

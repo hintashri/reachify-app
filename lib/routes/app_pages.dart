@@ -4,7 +4,7 @@ import 'package:reachify_app/modules/auth/mobile_no_screen.dart';
 import 'package:reachify_app/modules/auth/create_acc_screen.dart';
 import 'package:reachify_app/modules/products/category_screen.dart';
 import 'package:reachify_app/modules/home/init_home_screen.dart';
-import 'package:reachify_app/modules/profile/profile_screen.dart';
+import 'package:reachify_app/modules/products/wishlist_screen.dart';
 import 'package:reachify_app/modules/splash/splash_screen.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 
@@ -35,13 +35,13 @@ class AppPages {
       transition: swipeUp,
     ),
     GetPage(
-      name: AppRoutes.profile,
-      page: () => const ProfileScreen(),
+      name: AppRoutes.categoryScreen,
+      page: () => const CategoryScreen(),
       transition: rightLeft,
     ),
     GetPage(
-      name: AppRoutes.categoryScreen,
-      page: () => CategoryScreen(),
+      name: AppRoutes.wishlist,
+      page: () => WishlistScreen(),
       transition: rightLeft,
     ),
   ];

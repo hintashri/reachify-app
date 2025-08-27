@@ -3,6 +3,7 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:reachify_app/configuration/init_config.dart';
 import 'package:reachify_app/models/country_model.dart';
 import 'package:reachify_app/modules/auth/mobile_no_ctrl.dart';
 import 'package:reachify_app/theme/app_colors.dart';
@@ -111,7 +112,7 @@ class MobileNoScreen extends StatelessWidget {
                         ),
                         const SizedBox(height: 5),
                         CustomDropDownButton<String>(
-                          list: c.categoryList.map((e) => e.name).toList(),
+                          list: init.categoryList.map((e) => e.name).toList(),
                           value: c.categoryVal,
                           onChanged: (value) {
                             c.categoryVal = value;

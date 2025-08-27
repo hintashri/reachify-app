@@ -8,8 +8,12 @@ import 'package:reachify_app/utils/widgets/buttons/app_back_button.dart';
 import 'package:reachify_app/utils/widgets/cache_image.dart';
 import 'package:reachify_app/utils/widgets/loading_view.dart';
 
+import '../../configuration/init_config.dart';
+import '../../configuration/user_config.dart';
+import '../../utils/widgets/empty_view.dart';
+
 class CategoryScreen extends StatefulWidget {
-  CategoryScreen({super.key});
+  const CategoryScreen({super.key});
 
   @override
   State<CategoryScreen> createState() => _CategoryScreenState();
@@ -30,7 +34,7 @@ class _CategoryScreenState extends State<CategoryScreen>
     await c.getCategories();
     c.initLoading(false);
     tabCtrl = TabController(length: c.categoryList.length, vsync: this);
-    final int firstId = c.categoryList.elementAt(0).id;
+    final int firstId = c.categoryList.first.id;
     c.getProducts(categoryId: firstId);
     tabCtrl.addListener(() {
       logger.d('Called IT Finally');
@@ -111,6 +115,9 @@ class ProductGrid extends StatelessWidget {
       if (c.proLoading()) {
         return const LoaderView();
       } else {
+        if (c.productList.isEmpty) {
+          return const EmptyView();
+        }
         return GridView.builder(
           padding: const EdgeInsets.all(8),
           gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(

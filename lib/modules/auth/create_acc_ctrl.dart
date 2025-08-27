@@ -4,7 +4,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response, MultipartFile;
 import 'package:reachify_app/configuration/init_config.dart';
 import 'package:reachify_app/configuration/network_config.dart';
-import 'package:reachify_app/models/category_model.dart';
 import 'package:reachify_app/models/city_model.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/utils/const/url_const.dart';
@@ -83,10 +82,10 @@ class CreateAccCtrl extends GetxController {
   }
 
   Future<void> initCall() async {
-    await getCity();
-    if (cityList.isNotEmpty && init.bTypeList.isNotEmpty) {
-      initLoading(false);
+    if (init.bTypeList.isEmpty) {
+      await init.getBusinessType();
     }
+    await getCity();
   }
 
   Future<void> getCity() async {
@@ -103,12 +102,14 @@ class CreateAccCtrl extends GetxController {
             .toList();
         cityList = elements;
         cityList.sort((a, b) => a.name.compareTo(b.name));
-        logger.d(cityList.length);
+        // logger.d(cityList.length);
       } else {
         logger.e(response);
       }
+      initLoading(false);
     } catch (e, t) {
       logger.e('$e\n$t');
+      initLoading(false);
     }
   }
 
@@ -116,12 +117,14 @@ class CreateAccCtrl extends GetxController {
     try {
       if (filePath().isNotEmpty) {
         isButtonLoading(true);
+        final List<String> allVal = cityVal?.split(', ') ?? [];
+        final String str1 = allVal.first;
         final String country = cityList
-            .where((e) => e.name == cityVal)
+            .where((e) => e.name == str1)
             .first
             .countryName;
         final String state = cityList
-            .where((e) => e.name == cityVal)
+            .where((e) => e.name == str1)
             .first
             .stateName;
         final response = await net.post(

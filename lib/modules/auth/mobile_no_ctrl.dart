@@ -2,8 +2,8 @@ import 'dart:convert';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response;
+import 'package:reachify_app/configuration/init_config.dart';
 import 'package:reachify_app/configuration/user_config.dart';
-import 'package:reachify_app/models/category_model.dart';
 import 'package:reachify_app/models/country_model.dart';
 import 'package:reachify_app/models/user_model.dart';
 import 'package:reachify_app/routes/app_routes.dart';
@@ -23,7 +23,6 @@ class MobileNoCtrl extends GetxController {
   RxBool sendingOTP = false.obs;
   RxBool resendingOtp = false.obs;
   List<CountryModel> countryList = <CountryModel>[];
-  List<CategoryModel> categoryList = <CategoryModel>[];
 
   @override
   void onInit() {
@@ -37,10 +36,6 @@ class MobileNoCtrl extends GetxController {
 
   Future<void> initCall() async {
     await getCountries();
-    await getCategories();
-    if (countryList.isNotEmpty && categoryList.isNotEmpty) {
-      initLoading(false);
-    }
   }
 
   Future<void> getCountries() async {
@@ -56,31 +51,14 @@ class MobileNoCtrl extends GetxController {
             .map((json) => CountryModel.fromJson(json))
             .toList();
         countryList = elements;
-        logger.d(countryList.length);
+        // logger.d(countryList.length);
       } else {
         logger.e(response);
       }
+      initLoading(false);
     } catch (e, t) {
       logger.e('$e\n$t');
-    }
-  }
-
-  Future<void> getCategories() async {
-    try {
-      final response = await net.get(url: UrlConst.getCategories, params: {});
-      if (net.successfulRes(response: response)) {
-        // final jsonData = jsonDecode(response.data);
-        final List<dynamic> data = response.data;
-        final List<CategoryModel> elements = data
-            .map((json) => CategoryModel.fromJson(json))
-            .toList();
-        categoryList = elements;
-        logger.d(categoryList.length);
-      } else {
-        logger.e(response);
-      }
-    } catch (e, t) {
-      logger.e('$e\n$t');
+      initLoading(false);
     }
   }
 
@@ -113,7 +91,7 @@ class MobileNoCtrl extends GetxController {
     try {
       if (otpController.text.trim().isNotEmpty) {
         sendingOTP(true);
-        final int categoryID = categoryList
+        final int categoryID = init.categoryList
             .where((e) => e.name == categoryVal)
             .first
             .id;
@@ -134,10 +112,10 @@ class MobileNoCtrl extends GetxController {
             final UserModel appUser = await user.getUserFromApi();
             appUser.token = token;
             user.setUser(appUser);
-            if (user.appUser.isVerify == 1) {
-              Get.offAllNamed(AppRoutes.createAcc, arguments: [true]);
-            } else {
+            if (user.appUser.businessName.isNotEmpty) {
               Get.offAllNamed(AppRoutes.home);
+            } else {
+              Get.offAllNamed(AppRoutes.createAcc, arguments: [true]);
             }
           }
         } else {

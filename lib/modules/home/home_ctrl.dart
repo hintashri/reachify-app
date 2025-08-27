@@ -10,6 +10,8 @@ import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
 import 'package:reachify_app/utils/functions/app_func.dart';
 
+import '../products/wishlist_ctrl.dart';
+
 class HomeCtrl extends GetxController {
   @override
   void onInit() {
@@ -17,6 +19,8 @@ class HomeCtrl extends GetxController {
     super.onInit();
     initCall();
   }
+
+  final WishlistCtrl wishlistCtrl = Get.put(WishlistCtrl());
 
   Future<void> initCall() async {
     await getBanners();
@@ -48,7 +52,7 @@ class HomeCtrl extends GetxController {
             .map((json) => BannerModel.fromJson(json))
             .toList();
         bannerList(elements);
-        logger.d(bannerList.length);
+        // logger.d(bannerList.length);
       } else {
         logger.e(response);
       }
@@ -69,7 +73,7 @@ class HomeCtrl extends GetxController {
             .map((json) => CategoryModel.fromJson(json))
             .toList();
         homeList(elements);
-        logger.d(homeList.length);
+        // logger.d(homeList.length);
       } else {
         logger.e(response);
       }
