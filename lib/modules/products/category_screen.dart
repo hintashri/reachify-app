@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:reachify_app/models/category_model.dart';
 import 'package:reachify_app/modules/products/category_ctrl.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/utils/const/logger.dart';
@@ -8,8 +9,6 @@ import 'package:reachify_app/utils/widgets/buttons/app_back_button.dart';
 import 'package:reachify_app/utils/widgets/cache_image.dart';
 import 'package:reachify_app/utils/widgets/loading_view.dart';
 
-import '../../configuration/init_config.dart';
-import '../../configuration/user_config.dart';
 import '../../utils/widgets/empty_view.dart';
 
 class CategoryScreen extends StatefulWidget {
@@ -31,11 +30,17 @@ class _CategoryScreenState extends State<CategoryScreen>
   }
 
   Future<void> initCall() async {
+    final int id = Get.arguments;
     await c.getCategories();
     c.initLoading(false);
-    tabCtrl = TabController(length: c.categoryList.length, vsync: this);
-    final int firstId = c.categoryList.first.id;
-    c.getProducts(categoryId: firstId);
+    final index = c.categoryList.indexWhere((e) => e.id == id);
+    tabCtrl = TabController(
+      length: c.categoryList.length,
+      vsync: this,
+      initialIndex: index,
+    );
+    final CategoryModel firstId = c.categoryList.firstWhere((e) => e.id == id);
+    c.getProducts(categoryId: firstId.id);
     tabCtrl.addListener(() {
       logger.d('Called IT Finally');
       final int id = c.categoryList.elementAt(tabCtrl.index).id;

@@ -1,14 +1,14 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
-class InitHomeCtrl extends GetxController with GetSingleTickerProviderStateMixin {
+class InitHomeCtrl extends GetxController
+    with GetSingleTickerProviderStateMixin {
   /// animation
   late AnimationController animationController;
   late Animation<Offset> offsetAnimation;
 
   // Observable variables
   final RxBool isNavBarVisible = true.obs;
-  final RxBool isSearchBarVisible = true.obs;
   final RxBool hasUserScrolled = false.obs;
   RxInt activeTab = 0.obs;
 
@@ -117,5 +117,4 @@ class InitHomeCtrl extends GetxController with GetSingleTickerProviderStateMixin
     animationController.dispose();
     super.onClose();
   }
-
 }
