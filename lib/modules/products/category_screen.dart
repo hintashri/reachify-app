@@ -3,11 +3,10 @@ import 'package:get/get.dart';
 import 'package:reachify_app/modules/products/category_ctrl.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/utils/const/logger.dart';
-import 'package:reachify_app/utils/const/url_const.dart';
 import 'package:reachify_app/utils/widgets/buttons/app_back_button.dart';
-import 'package:reachify_app/utils/widgets/cache_image.dart';
 import 'package:reachify_app/utils/widgets/loading_view.dart';
-
+import 'package:reachify_app/utils/widgets/product_card.dart';
+import '../../models/category_model.dart';
 import '../../utils/widgets/empty_view.dart';
 
 class CategoryScreen extends StatefulWidget {
@@ -41,6 +40,7 @@ class _CategoryScreenState extends State<CategoryScreen>
     final CategoryModel firstId = c.categoryList.firstWhere((e) => e.id == id);
     c.getProducts(categoryId: firstId.id);
     tabCtrl.addListener(() {
+      c.proLoading(true);
       logger.d('Called IT Finally');
       final int id = c.categoryList.elementAt(tabCtrl.index).id;
       c.getProducts(categoryId: id);
@@ -133,32 +133,10 @@ class ProductGrid extends StatelessWidget {
           itemCount: c.productList.length,
           itemBuilder: (context, index) {
             final item = c.productList[index];
-            return ProductCard(imageUrl: item.images.first);
+            return ProductCard(product: item);
           },
         );
       }
     });
-  }
-}
-
-class ProductCard extends StatelessWidget {
-  final String imageUrl;
-
-  const ProductCard({super.key, required this.imageUrl});
-
-  @override
-  Widget build(BuildContext context) {
-    return Card(
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),
-      elevation: 3,
-      child: ClipRRect(
-        borderRadius: BorderRadius.circular(12),
-        child: CacheImage(
-          url: '${UrlConst.baseUrl}/storage/app/public/product/$imageUrl',
-          fit: BoxFit.cover,
-          width: double.infinity,
-        ),
-      ),
-    );
   }
 }

@@ -26,4 +26,10 @@ class AssetConst {
   static const String notification = '$icons/drawer_icons/notification.png';
   static const String promote = '$icons/drawer_icons/promote.png';
   static const String profile = '$icons/drawer_icons/profile.png';
+
+  static const String call = '$icons/detail_icons/call.png';
+  static const String likeFill = '$icons/detail_icons/like_fill.png';
+  static const String mail = '$icons/detail_icons/mail.png';
+  static const String web = '$icons/detail_icons/web.png';
+  static const String whatsapp = '$icons/detail_icons/whatsapp.png';
 }
