@@ -1,203 +1,230 @@
-// import 'dart:convert';
 // import 'dart:io';
+//
+// import 'package:firebase_messaging/firebase_messaging.dart';
+// import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 // import 'package:reachify_app/utils/const/logger.dart';
+// import 'package:timezone/data/latest.dart' as tz;
+// import 'package:timezone/timezone.dart' as tz;
 //
-// class NotificationConfig {
-//   static final FlutterLocalNotificationsPlugin notificationsPlugin =
+//
+// @pragma('vm:entry-point')
+// void selectNotification(NotificationResponse response) async {
+//   logger.d('Notification Payload:${response.payload}');
+// }
+//
+//
+// class NotificationServices {
+//   static final FlutterLocalNotificationsPlugin flutterLocalNotificationsPlugin =
 //       FlutterLocalNotificationsPlugin();
+//   static final FirebaseMessaging _firebaseMessaging =
+//       FirebaseMessaging.instance;
 //
-//   static var android = const AndroidNotificationDetails(
-//     'channel id', 'FCM',
-//     //'channel_desc',
-//     priority: Priority.high,
-//     importance: Importance.max,
+//   /// set icon path here
+//   static const AndroidInitializationSettings initializationSettingsAndroid =
+//       AndroidInitializationSettings('@mipmap/ic_launcher');
+//
+//   static const DarwinInitializationSettings initializationSettingsIOS =
+//       DarwinInitializationSettings(
+//     requestSoundPermission: true,
+//     requestBadgePermission: true,
+//     requestAlertPermission: true,
 //   );
 //
-//   static var iOS = const DarwinNotificationDetails(presentSound: true);
+//   static const DarwinInitializationSettings initializationSettingsMacOS =
+//       DarwinInitializationSettings(
+//     requestAlertPermission: true,
+//     requestBadgePermission: true,
+//     requestSoundPermission: true,
+//   );
 //
-//   Future<void> fcmInit() async {
-//     logger.f('INIT NOTIFICATION');
+//   static const InitializationSettings initializationSettings =
+//       InitializationSettings(
+//     android: initializationSettingsAndroid,
+//     iOS: initializationSettingsIOS,
+//     macOS: initializationSettingsMacOS,
+//   );
 //
+//   static const AndroidNotificationDetails androidPlatformChannelSpecifics =
+//       AndroidNotificationDetails(
+//     'notification_channel',
+//     'your_channel_name',
+//     channelDescription: 'your_channel_description',
+//     importance: Importance.max,
+//     priority: Priority.high,
+//     ticker: 'ticker',
+//     icon: '@mipmap/ic_launcher',
+//   );
+//
+//   static const ios = DarwinNotificationDetails(
+//     interruptionLevel: InterruptionLevel.timeSensitive,
+//   );
+//
+//   static const NotificationDetails platformChannelSpecifics =
+//       NotificationDetails(
+//           android: androidPlatformChannelSpecifics, iOS: ios, macOS: ios);
+//
+//   static Future<void> notificationRequest() async {
+//     if (Platform.isIOS || Platform.isMacOS) {
+//       await flutterLocalNotificationsPlugin
+//           .resolvePlatformSpecificImplementation<
+//               IOSFlutterLocalNotificationsPlugin>()
+//           ?.requestPermissions(
+//             alert: true,
+//             badge: true,
+//             sound: true,
+//           );
+//       await flutterLocalNotificationsPlugin
+//           .resolvePlatformSpecificImplementation<
+//               MacOSFlutterLocalNotificationsPlugin>()
+//           ?.requestPermissions(
+//             alert: true,
+//             badge: true,
+//             sound: true,
+//           );
+//     } else if (Platform.isAndroid) {
+//       await flutterLocalNotificationsPlugin
+//           .resolvePlatformSpecificImplementation<
+//               AndroidFlutterLocalNotificationsPlugin>()
+//           ?.requestNotificationsPermission();
+//     }
+//   }
+//
+//   static Future<void> initNotification() async {
 //     try {
-//       // tz.initializeTimeZones();
-//       // if(Platform.isIOS) await FirebaseMessaging.instance.requestPermission();
-//       await FirebaseMessaging.instance.requestPermission();
-//       FirebaseMessaging.onBackgroundMessage(_firebaseMessagingBg);
-//
-//       const InitializationSettings settings = InitializationSettings(
-//         android: AndroidInitializationSettings('@mipmap/ic_launcher'),
-//         iOS: DarwinInitializationSettings(defaultPresentSound: true),
+//       tz.initializeTimeZones();
+//       // toast('Local notification initialize');
+//       await flutterLocalNotificationsPlugin.initialize(
+//         initializationSettings,
+//         onDidReceiveBackgroundNotificationResponse: selectNotification,
+//         onDidReceiveNotificationResponse: selectNotification,
 //       );
-//
-//       await notificationsPlugin.initialize(settings,
-//           onDidReceiveNotificationResponse: (payload) async {
-//         print('notification 1 ==> onDidReceiveNotificationResponse');
-//         final data = json.decode(payload.payload!);
-//         logger.i('Notification Payload ==> $data');
-//         onMessage(
-//           message: RemoteMessage.fromMap({'data': data}),
-//         );
-//       });
-//
-//       await FirebaseMessaging.instance
-//           .setForegroundNotificationPresentationOptions(
-//         alert: true,
-//         badge: true,
-//         sound: true,
-//       );
-//       await FirebaseMessaging.instance.setAutoInitEnabled(true);
-//
-//       await FirebaseMessaging.instance
-//           .getInitialMessage()
-//           .then((RemoteMessage? remoteMessage) async {
-//         //this is for outside app notification
-//         if (remoteMessage != null) {
-//           final String jsonMessage = jsonEncode(remoteMessage.data);
-//           print('notification 2 ==> remote message');
-//           logger.i('Notification remote message ==> $jsonMessage');
-//           // HomeController.hasNotification(true);
-//
-//           onMessage(message: remoteMessage);
+//       logger.d('NOTIFICATION INIT');
+//       // toast('Notification Req Called');
+//       await notificationRequest();
+//       // toast('Notification Request Complete');
+//       if (Platform.isIOS) {
+//         // toast('getNotificationAppLaunchDetails Called');
+//         final NotificationAppLaunchDetails? details =
+//             await flutterLocalNotificationsPlugin
+//                 .getNotificationAppLaunchDetails();
+//         if (details != null && details.notificationResponse != null) {
+//           // logger.d(
+//           //     "Notification Message :${details.notificationResponse?.payload}");
+//           selectNotification(details.notificationResponse!);
 //         }
-//       });
-//
-//       if (Platform.isAndroid) {
-//         FirebaseMessaging.onMessage.listen(onForegroundMessage);
-//       } else if (Platform.isIOS) {
-//         logger.d('version ==> ${await getOSVersion()}');
-//         FirebaseMessaging.onMessage.listen(
-//           (event) {
-//             print('notification 3 ==> event message');
-//             logger.d('event on on message==>  $event');
-//             // Get.find<NotificationCtrl>()
-//             //     .addNotification(notificationData: event);
-//             // HomeController.hasNotification(true);
-//           },
-//         );
-//         if (await getOSVersion() < 15.0) {
-//           FirebaseMessaging.onMessage.listen(onForegroundMessage);
-//         }
+//         await flutterLocalNotificationsPlugin.cancelAll();
 //       }
+//       // toast('FirebaseMessaging.onMessage Called');
 //
-//       //IN UI
 //
-//       FirebaseMessaging.onMessageOpenedApp
-//           .listen((RemoteMessage message) async {
-//         try {
-//           final msg = message.data;
-//           print('notification 4 ==> onMessageOpenedApp');
+//       FirebaseMessaging.onMessage.listen((RemoteMessage message) {
+//         final RemoteNotification? notification = message.notification;
 //
-//           logger.i('Notification msg ==> $msg');
-//           onMessage(message: message);
-//         } catch (e) {
-//           logger.e(e);
+//         if (notification != null) {
+//           showNotification(
+//             id: notification.hashCode,
+//             title: notification.title ?? 'No Title',
+//             body: notification.body ?? 'No Body',
+//             // payload: message.data['payload'] ?? '',
+//             payload: message.data['app_redirection'] ?? '',
+//           );
 //         }
 //       });
-//     } catch (e) {
-//       logger.e(e);
-//     }
-//   }
-//
-//   Future<void> onForegroundMessage(RemoteMessage message) async {
-//     try {
-//       final msg = message.data;
-//       print('notification 5 ==> INCOMING MESSAGE NOTIFICATION');
-//       logger.i(
-//           'INCOMING MESSAGE NOTIFICATION DATA:${json.encode(message.toMap())}');
-//       //
-//       // HomeController.hasNotification(true);
-//       // Get.find<NotificationCtrl>().addNotification(notificationData: message);
-//       if (message.notification != null) {
-//         await notificationsPlugin.show(
-//           0,
-//           message.notification!.title,
-//           message.notification!.body,
-//           NotificationDetails(android: android, iOS: iOS),
-//           payload: json.encode(msg),
+//       final res = await FirebaseMessaging.instance.getInitialMessage();
+//       if (res != null) {
+//         logger.d('Notification Details :${res.toMap()}');
+//         selectNotification(
+//           NotificationResponse(
+//             id: res.messageId.hashCode,
+//             payload: res.data['app_redirection'],
+//             input: '',
+//             actionId: '',
+//             notificationResponseType:
+//                 NotificationResponseType.selectedNotificationAction,
+//           ),
 //         );
 //       }
-//     } catch (e) {
-//       logger.e(e);
+//     } catch (e, t) {
+//       logger.e('Error On Init Notification Function :$e', stackTrace: t);
 //     }
 //   }
 //
-//   Future<void> onMessage({RemoteMessage? message}) async {
+//   static Future<String?> getToken() async {
 //     try {
-//       logger.i('on message');
-//
-//       final Map<String, dynamic> payload = message!.data;
-//       loggerNoStack.w('Payload: $payload');
-//       //Received Message
-//       // if (payload["ref_id"] != null) {
-//       //   var bookId = int.parse(payload["ref_id"]);
-//       //   AppFunctions.appRoute(routeName: Routes.storyDetails, bookId: bookId);
-//       // }
-//     } catch (e) {
-//       logger.e('onMessage : $e');
+//       if (!Platform.isWindows) {
+//         final res = await _firebaseMessaging.getToken();
+//         // logger.d('Response :$res');
+//         return res;
+//         // return await _firebaseMessaging.getToken();
+//       } else {
+//         return 'N/A';
+//       }
+//     } on Exception catch (e) {
+//       logger.d('Error Found on get FCM TOKEN :$e');
+//       return 'N/A';
 //     }
 //   }
 //
-//   // static Future<void> scheduleNotifications(
-//   //     {required DateTime scheduledTime}) async {
-//   //   logger.i(scheduledTime, 'scheduledTime');
-//   //   try {
-//   //     var time = tz.TZDateTime.parse(tz.local, scheduledTime.toString());
-//   //     var data = {'msg': 'limit reach', 'id': 0};
-//   //     await notificationsPlugin.zonedSchedule(
-//   //       0,
-//   //       'Time for another Tale!',
-//   //       'Open the app and let the storytelling magic continue!',
-//   //       time,
-//   //       NotificationDetails(android: android, iOS: iOS),
-//   //       androidAllowWhileIdle: true,
-//   //       payload: json.encode(data),
-//   //       // matchDateTimeComponents: DateTimeComponents.dateAndTime,
-//   //       // androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
-//   //       uiLocalNotificationDateInterpretation:
-//   //           UILocalNotificationDateInterpretation.absoluteTime,
-//   //     );
-//   //   } catch (e, t) {
-//   //     logger.e('Notification Error :$e \n Trace :$t', '$scheduledTime');
+//   // static Future<void> updateTokens() async {
+//   //   if (Platform.isIOS || Platform.isAndroid || Platform.isMacOS) {
+//   //     String? fcmToken = await _firebaseMessaging.getToken();
+//   //     logger.d('FCM Token: $fcmToken');
+//   //
+//   //     // Get the device ID
+//   //     String deviceId = await DeviceInfoService.getDeviceId();
+//   //     // logger.d('Device ID: $deviceId');
 //   //   }
 //   // }
 //
-//   Future<double> getOSVersion() async {
-//     final DeviceInfoPlugin info = DeviceInfoPlugin();
-//     try {
-//       final data = await info.iosInfo;
-//       final version = data.systemVersion;
-//       final splitStr = version.split('.');
-//       final dummy = '${splitStr[0]}.${splitStr[1]}';
-//       return double.tryParse(dummy) ?? 0.0;
-//     } catch (error) {
-//       logger.e('Error in OS Version ${error.toString()}');
-//     }
-//     return 0.0;
+//   static Future<void> removeNotification({required int id}) async {
+//     await flutterLocalNotificationsPlugin.cancel(id);
 //   }
-// }
 //
-// Future<void> _firebaseMessagingBg(RemoteMessage message) async {
-//   logger.i('background open');
-//
-//   FirebaseMessaging.onMessageOpenedApp.listen((RemoteMessage message) async {
+//   static Future<void> scheduleNotifications({
+//     required int id,
+//     required String title,
+//     required String body,
+//     required DateTime scheduledTime,
+//     required String payload,
+//   }) async {
 //     try {
-//       // var msg = message.data;
-//       try {
-//         logger.i('on message');
-//
-//         final Map<String, dynamic> payload = message.data;
-//         loggerNoStack.w('Payload: $payload');
-//         //Received Message
-//
-//         // if (payload["ref_id"] != null) {
-//         //   var bookId = int.parse(payload["ref_id"]);
-//         //   AppFunctions.appRoute(routeName: Routes.storyDetails, bookId: bookId);
-//         // }
-//       } catch (e) {
-//         logger.e('onMessage : $e');
-//       }
-//     } catch (e) {
-//       logger.e(e);
+//       final time = tz.TZDateTime.from(scheduledTime, tz.local);
+//       logger.d(
+//           'Notification ID $id \nTitle :$title \nBody :$body \nPayload :$payload');
+//       await flutterLocalNotificationsPlugin.zonedSchedule(
+//         id,
+//         title,
+//         body,
+//         time,
+//         platformChannelSpecifics,
+//         payload: payload,
+//         androidScheduleMode: AndroidScheduleMode.alarmClock,
+//         // uiLocalNotificationDateInterpretation:
+//         //     UILocalNotificationDateInterpretation.absoluteTime,
+//       );
+//     } catch (e, t) {
+//       logger.e('Notification Error :$e \n Trace :$t');
 //     }
-//   });
+//   }
+//
+//   static Future<void> showNotification({
+//     required int id,
+//     required String title,
+//     required String body,
+//     String? payload,
+//   }) async {
+//     try {
+//       logger.d(
+//           'Notification ID $id \nTitle :$title \nBody :$body \nPayload :$payload');
+//       await flutterLocalNotificationsPlugin.show(
+//         id,
+//         title,
+//         body,
+//         platformChannelSpecifics,
+//         payload: payload,
+//       );
+//     } catch (e, t) {
+//       logger.e('Error :$e \n Trace :$t');
+//     }
+//   }
 // }
