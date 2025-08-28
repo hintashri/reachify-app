@@ -9,6 +9,7 @@ import 'package:reachify_app/utils/functions/validation_func.dart';
 import 'package:reachify_app/utils/widgets/buttons/auth_elevated_button.dart';
 import 'package:reachify_app/utils/widgets/custom_dropdown.dart';
 import 'package:reachify_app/utils/widgets/loading_view.dart';
+
 import '../../utils/widgets/auth_textfield.dart';
 
 class PromoteBrand extends StatelessWidget {
@@ -24,16 +25,14 @@ class PromoteBrand extends StatelessWidget {
         actions: [
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 10, 10, 0),
-            child: Obx(() {
-              return InkWell(
-                onTap: Get.back,
-                borderRadius: BorderRadius.circular(10),
-                child: const Padding(
-                  padding: EdgeInsets.all(10),
-                  child: Icon(Icons.close_rounded, color: Colors.black),
-                ),
-              );
-            }),
+            child: InkWell(
+              onTap: Get.back,
+              borderRadius: BorderRadius.circular(10),
+              child: const Padding(
+                padding: EdgeInsets.all(10),
+                child: Icon(Icons.close_rounded, color: Colors.black),
+              ),
+            ),
           ),
         ],
       ),
@@ -50,7 +49,8 @@ class PromoteBrand extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Promote Your Brand',
+                      // 'Promote Your Brand',
+                      c.title.value,
                       style: context.textTheme.labelLarge?.copyWith(
                         color: AppColors.textDark,
                       ),

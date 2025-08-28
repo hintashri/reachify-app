@@ -14,13 +14,11 @@ import 'package:reachify_app/utils/const/logger.dart';
 import 'package:reachify_app/utils/const/url_const.dart';
 import 'package:reachify_app/utils/functions/app_func.dart';
 
-import '../products/wishlist_ctrl.dart';
 import 'init_home_ctrl.dart';
 
 class HomeCtrl extends GetxController with GetSingleTickerProviderStateMixin {
   final InitHomeCtrl initHomeCtrl = Get.find<InitHomeCtrl>();
   TextEditingController searchCTRL = TextEditingController();
-  Timer? debounce;
   RxList<ProductModel> searchList = <ProductModel>[].obs;
   RxString searchParam = ''.obs;
 
@@ -70,12 +68,9 @@ class HomeCtrl extends GetxController with GetSingleTickerProviderStateMixin {
 
   @override
   void onClose() {
-    debounce?.cancel();
     searchController.dispose();
     super.onClose();
   }
-
-  final WishlistCtrl wishlistCtrl = Get.put(WishlistCtrl());
 
   Future<void> initCall() async {
     isLoading(true);
@@ -142,14 +137,13 @@ class HomeCtrl extends GetxController with GetSingleTickerProviderStateMixin {
     }
   }
 
-  Future<void> search(String? param) async {
+  Future<void> search() async {
     try {
-      searchParam(param);
-      if (param == null) return;
+      if (searchParam.isEmpty) return;
       isSearching(true);
       final response = await net.get(
         url: UrlConst.getProductSearch,
-        params: {'search': param},
+        params: {'search': searchParam.value},
       );
       if (net.successfulRes(response: response)) {
         if (response.data is List) {
@@ -159,9 +153,11 @@ class HomeCtrl extends GetxController with GetSingleTickerProviderStateMixin {
               .map((json) => ProductModel.fromJson(json))
               .toList();
           searchList(elements);
+          Get.toNamed(AppRoutes.searchList);
           logger.d(searchList.length);
         } else {
           searchList([]);
+          Get.toNamed(AppRoutes.searchList);
         }
       } else {
         logger.e(response);

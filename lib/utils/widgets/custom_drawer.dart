@@ -67,7 +67,12 @@ class CustomDrawer extends StatelessWidget {
                     context: context,
                     assetIcon: AssetConst.promote,
                     title: 'Promote Your Brand',
-                    onTap: () {},
+                    onTap: () {
+                      Get.toNamed(
+                        AppRoutes.promoteBrand,
+                        arguments: 'Promote Your Brand',
+                      );
+                    },
                   ),
                   drawerTile(
                     context: context,
@@ -99,7 +104,12 @@ class CustomDrawer extends StatelessWidget {
                     context: context,
                     assetIcon: AssetConst.contactUs,
                     title: 'Contact Us',
-                    onTap: () {},
+                    onTap: () {
+                      Get.toNamed(
+                        AppRoutes.promoteBrand,
+                        arguments: 'Contact Us',
+                      );
+                    },
                   ),
                   drawerTile(
                     context: context,

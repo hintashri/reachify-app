@@ -1,10 +1,13 @@
 import 'package:get/get.dart';
-import 'package:reachify_app/modules/auth/otp_screen.dart';
-import 'package:reachify_app/modules/auth/mobile_no_screen.dart';
 import 'package:reachify_app/modules/auth/create_acc_screen.dart';
-import 'package:reachify_app/modules/products/category_screen.dart';
+import 'package:reachify_app/modules/auth/mobile_no_screen.dart';
+import 'package:reachify_app/modules/auth/otp_screen.dart';
 import 'package:reachify_app/modules/home/init_home_screen.dart';
+import 'package:reachify_app/modules/home/search_list_screen.dart';
+import 'package:reachify_app/modules/products/category_screen.dart';
+import 'package:reachify_app/modules/products/product_detail.dart';
 import 'package:reachify_app/modules/products/wishlist_screen.dart';
+import 'package:reachify_app/modules/promote_brand/promote_brand.dart';
 import 'package:reachify_app/modules/splash/splash_screen.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 
@@ -42,6 +45,21 @@ class AppPages {
     GetPage(
       name: AppRoutes.wishlist,
       page: () => WishlistScreen(),
+      transition: rightLeft,
+    ),
+    GetPage(
+      name: AppRoutes.searchList,
+      page: () => SearchListScreen(),
+      transition: rightLeft,
+    ),
+    GetPage(
+      name: AppRoutes.productDetail,
+      page: () => ProductDetailScreen(),
+      transition: rightLeft,
+    ),
+    GetPage(
+      name: AppRoutes.promoteBrand,
+      page: () => PromoteBrand(),
       transition: rightLeft,
     ),
   ];

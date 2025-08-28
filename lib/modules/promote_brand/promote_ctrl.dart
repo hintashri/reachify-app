@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response, MultipartFile;
 import 'package:reachify_app/configuration/init_config.dart';
@@ -7,6 +8,7 @@ import 'package:reachify_app/models/city_model.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/utils/const/url_const.dart';
 import 'package:reachify_app/utils/functions/app_func.dart';
+
 import '../../utils/const/logger.dart';
 
 class PromoteCtrl extends GetxController {
@@ -17,11 +19,20 @@ class PromoteCtrl extends GetxController {
   RxBool isButtonLoading = false.obs;
   RxBool initLoading = true.obs;
   List<CityModel> cityList = <CityModel>[];
+  RxString title = ''.obs;
 
   @override
   void onInit() {
     super.onInit();
+    setData();
     initCall();
+  }
+
+  void setData() {
+    final data = Get.arguments;
+    if (data is String && data.isNotEmpty) {
+      title(data);
+    }
   }
 
   Future<void> initCall() async {

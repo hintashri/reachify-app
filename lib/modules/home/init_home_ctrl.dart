@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 
+import '../products/wishlist_ctrl.dart';
+
 class InitHomeCtrl extends GetxController
     with GetSingleTickerProviderStateMixin {
   /// animation
@@ -22,6 +24,11 @@ class InitHomeCtrl extends GetxController
   void onInit() {
     super.onInit();
     _initializeAnimation();
+    initController();
+  }
+
+  void initController() {
+    Get.lazyPut(() => WishlistCtrl(), fenix: true);
   }
 
   void _initializeAnimation() {

@@ -9,20 +9,24 @@ class AuthTextField extends StatelessWidget {
   final FormFieldValidator<String>? validator;
   final TextEditingController? controller;
   final Widget? prefixIcon;
+  final Widget? suffixIcon;
   final TextInputType? textInputType;
   final List<TextInputFormatter>? inputFormatters;
   final FormFieldSetter<String>? onChange;
   final double radius;
+  final void Function(String)? onFieldSubmitted;
 
   const AuthTextField({
     super.key,
     this.textInputAction,
     this.prefixIcon,
+    this.suffixIcon,
     this.textInputType,
     this.inputFormatters,
     this.controller,
     this.validator,
     this.onChange,
+    this.onFieldSubmitted,
     this.radius = 10,
     required this.hintText,
   });
@@ -32,6 +36,7 @@ class AuthTextField extends StatelessWidget {
     return TextFormField(
       onTapOutside: (event) => FocusScope.of(context).unfocus(),
       controller: controller,
+      onFieldSubmitted: onFieldSubmitted,
       style: context.textTheme.labelMedium,
       validator: validator,
       inputFormatters: inputFormatters,
@@ -41,6 +46,7 @@ class AuthTextField extends StatelessWidget {
       autofillHints: null,
       decoration: InputDecoration(
         prefixIcon: prefixIcon,
+        suffixIcon: suffixIcon,
         contentPadding: const EdgeInsets.symmetric(horizontal: 14),
         hintText: hintText,
         hintStyle: context.textTheme.labelMedium?.copyWith(

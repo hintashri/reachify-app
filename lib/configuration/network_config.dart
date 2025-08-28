@@ -1,6 +1,8 @@
 import 'dart:convert';
 import 'dart:io';
+
 import 'package:dio/dio.dart';
+
 import '../utils/const/logger.dart';
 
 final NetworkConfig net = NetworkConfig.instance;
@@ -42,6 +44,34 @@ class NetworkConfig {
     );
     return _dio
         .get(url, queryParameters: params)
+        .then(_success)
+        .catchError(_failed);
+  }
+
+  dynamic delete({
+    required String url,
+    required Map<String, dynamic> params,
+  }) async {
+    final keysToRemove = <String>[];
+    params.forEach((key, value) {
+      if ((value is String) && (params[key].isEmpty)) {
+        keysToRemove.add(key);
+      }
+    });
+    for (var key in keysToRemove) {
+      params.remove(key);
+    }
+
+    logger.d(
+      'CALLING DELETE NET\nURL: $url\nPARAMS: $params\nHEADERS: ${_dio.options.headers}',
+    );
+
+    return _dio
+        .delete(
+          url,
+          queryParameters: params, // for query params
+          // data: params, // use this if API expects body instead
+        )
         .then(_success)
         .catchError(_failed);
   }

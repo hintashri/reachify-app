@@ -6,6 +6,7 @@ import 'package:reachify_app/utils/const/logger.dart';
 import 'package:reachify_app/utils/widgets/buttons/app_back_button.dart';
 import 'package:reachify_app/utils/widgets/loading_view.dart';
 import 'package:reachify_app/utils/widgets/product_card.dart';
+
 import '../../models/category_model.dart';
 import '../../utils/widgets/empty_view.dart';
 
@@ -133,7 +134,7 @@ class ProductGrid extends StatelessWidget {
           itemCount: c.productList.length,
           itemBuilder: (context, index) {
             final item = c.productList[index];
-            return ProductCard(product: item);
+            return ProductCard(product: item, index: index);
           },
         );
       }

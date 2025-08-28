@@ -45,9 +45,12 @@ class CategoryCtrl extends GetxController {
     }
   }
 
-  Future<void> getProducts({required int categoryId}) async {
+  Future<void> getProducts({
+    required int categoryId,
+    bool showLoader = true,
+  }) async {
     try {
-      proLoading(true);
+      if (showLoader) proLoading(true);
       final response = await net.post(
         url: UrlConst.getProducts,
         params: {'id': categoryId},

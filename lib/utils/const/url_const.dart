@@ -25,4 +25,6 @@ class UrlConst {
   static const getProCategories = '$baseUrl/api/v1/categories/subcategory';
 
   static const getWishlist = '$baseUrl/api/v1/customer/wish-list';
+  static const addWishlist = '$baseUrl/api/v1/customer/wish-list/add';
+  static const removeWishlist = '$baseUrl/api/v1/customer/wish-list/remove';
 }

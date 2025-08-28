@@ -4,6 +4,7 @@ import 'package:reachify_app/modules/products/wishlist_ctrl.dart';
 import 'package:reachify_app/utils/widgets/buttons/app_back_button.dart';
 import 'package:reachify_app/utils/widgets/empty_view.dart';
 import 'package:reachify_app/utils/widgets/product_card.dart';
+
 import '../../utils/widgets/loading_view.dart';
 
 class WishlistScreen extends StatelessWidget {
@@ -37,7 +38,7 @@ class WishlistScreen extends StatelessWidget {
             itemCount: c.productList.length,
             itemBuilder: (context, index) {
               final item = c.productList[index];
-              return ProductCard(product: item);
+              return ProductCard(product: item, index: index);
             },
           );
         }
