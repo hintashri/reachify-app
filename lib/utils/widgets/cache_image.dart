@@ -8,6 +8,7 @@ class CacheImage extends StatelessWidget {
   final double? height;
   final double? width;
   final BoxFit? fit;
+  final Widget Function(BuildContext, ImageProvider<Object>)? imageBuilder;
 
   const CacheImage({
     super.key,
@@ -15,6 +16,7 @@ class CacheImage extends StatelessWidget {
     this.height,
     this.width,
     this.fit,
+    this.imageBuilder,
   });
 
   @override
@@ -24,8 +26,9 @@ class CacheImage extends StatelessWidget {
       child: CachedNetworkImage(
         imageUrl: url,
         fit: fit ?? BoxFit.cover,
-        width: width ?? context.width,
-        height: height ?? context.height,
+        width: width,
+        height: height,
+        imageBuilder: imageBuilder,
         placeholder: (context, url) => ShimmerWidget(
           width: width ?? context.width,
           height: height ?? context.height,
@@ -45,10 +48,10 @@ class ShimmerWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return Shimmer.fromColors(
       // enabled: false,
-      direction: ShimmerDirection.ttb,
+      direction: ShimmerDirection.ltr,
       period: const Duration(milliseconds: 1500),
-      baseColor: Colors.grey.shade400,
-      highlightColor: Colors.grey.shade300,
+      baseColor: Colors.grey.shade500,
+      highlightColor: Colors.grey.shade400,
       child: Container(
         height: height,
         width: width,

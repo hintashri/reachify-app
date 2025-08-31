@@ -62,7 +62,11 @@ class _CategoryScreenState extends State<CategoryScreen>
       appBar: AppBar(
         leading: const AppBackButton(),
         centerTitle: true,
-        title: Text(c.categoryName, style: context.textTheme.labelLarge),
+        title: Text(
+          c.categoryName,
+          style: context.textTheme.labelLarge,
+          // style: context.textTheme.labelLarge?.copyWith(fontSize: 22),
+        ),
       ),
       body: Obx(() {
         if (c.initLoading()) {
@@ -133,8 +137,7 @@ class ProductGrid extends StatelessWidget {
           ),
           itemCount: c.productList.length,
           itemBuilder: (context, index) {
-            final item = c.productList[index];
-            return ProductCard(product: item, index: index);
+            return ProductCard(index: index, list: c.productList);
           },
         );
       }

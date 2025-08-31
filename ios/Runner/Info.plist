@@ -24,6 +24,22 @@
 	<string>$(FLUTTER_BUILD_NUMBER)</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NSAppTransportSecurity</key>
+    <dict>
+      <key>NSAllowsArbitraryLoads</key>
+      <true/>
+    </dict>
+    <key>LSApplicationQueriesSchemes</key>
+    <array>
+      <string>http</string>
+      <string>https</string>
+      <string>mailto</string>
+      <string>tel</string>
+      <string>whatsapp</string>
+      <string>fb</string>
+      <string>instagram</string>
+      <string>linkedin</string>
+    </array>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>
@@ -41,19 +57,6 @@
 		<string>UIInterfaceOrientationLandscapeLeft</string>
 		<string>UIInterfaceOrientationLandscapeRight</string>
 	</array>
-	<key>LSApplicationQueriesSchemes</key>
-    <array>
-          <string>http</string>
-          <string>https</string>
-          <string>tel</string>
-          <string>mailto</string>
-          <string>whatsapp</string>
-    </array>
-    	<key>UIBackgroundModes</key>
-    	<array>
-    		<string>remote-notification</string>
-    		<string>fetch</string>
-    	</array>
 	<key>CADisableMinimumFrameDurationOnPhone</key>
 	<true/>
 	<key>UIApplicationSupportsIndirectInputEvents</key>

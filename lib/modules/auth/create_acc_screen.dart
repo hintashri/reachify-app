@@ -5,16 +5,20 @@ import 'package:dotted_border/dotted_border.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reachify_app/configuration/init_config.dart';
+import 'package:reachify_app/configuration/user_config.dart';
 import 'package:reachify_app/modules/auth/create_acc_ctrl.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
 import 'package:reachify_app/utils/const/logger.dart';
+import 'package:reachify_app/utils/const/url_const.dart';
 import 'package:reachify_app/utils/functions/app_file_picker.dart';
 import 'package:reachify_app/utils/functions/validation_func.dart';
 import 'package:reachify_app/utils/widgets/buttons/app_back_button.dart';
 import 'package:reachify_app/utils/widgets/buttons/auth_elevated_button.dart';
+import 'package:reachify_app/utils/widgets/cache_image.dart';
 import 'package:reachify_app/utils/widgets/custom_dropdown.dart';
 import 'package:reachify_app/utils/widgets/loading_view.dart';
+
 import '../../utils/widgets/auth_textfield.dart';
 
 class CreateAccScreen extends StatelessWidget {
@@ -32,33 +36,40 @@ class CreateAccScreen extends StatelessWidget {
           Padding(
             padding: const EdgeInsets.fromLTRB(0, 10, 10, 0),
             child: Obx(() {
-              return InkWell(
-                onTap: c.initLoading()
-                    ? null
-                    : () {
-                        c.manageSkip();
-                      },
-                borderRadius: BorderRadius.circular(10),
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10,
-                    vertical: 5,
-                  ),
-                  child: Text(
-                    'SKIP',
-                    style: context.textTheme.labelMedium?.copyWith(
-                      color: AppColors.textLight,
-                      fontWeight: FontWeight.w600,
+              if (c.canSkip.isTrue && user.appUser().businessName.isEmpty) {
+                return InkWell(
+                  onTap: c.initLoading()
+                      ? null
+                      : () {
+                          c.useSkipToday();
+                        },
+                  borderRadius: BorderRadius.circular(10),
+                  child: Padding(
+                    padding: const EdgeInsets.symmetric(
+                      horizontal: 10,
+                      vertical: 5,
+                    ),
+                    child: Text(
+                      'SKIP',
+                      style: context.textTheme.labelMedium?.copyWith(
+                        color: AppColors.textLight,
+                        fontWeight: FontWeight.w600,
+                      ),
                     ),
                   ),
-                ),
-              );
+                );
+              } else {
+                return IconButton(
+                  onPressed: Get.back,
+                  icon: const Icon(Icons.close),
+                );
+              }
             }),
           ),
         ],
       ),
       body: Obx(() {
-        if (c.initLoading()) {
+        if (c.initLoading.isTrue) {
           return const LoaderView();
         } else {
           return SingleChildScrollView(
@@ -70,7 +81,9 @@ class CreateAccScreen extends StatelessWidget {
                   crossAxisAlignment: CrossAxisAlignment.stretch,
                   children: [
                     Text(
-                      'Create an account',
+                      user.appUser().businessName.isNotEmpty
+                          ? 'Update Profile'
+                          : 'Create an account',
                       style: context.textTheme.labelLarge?.copyWith(
                         color: AppColors.textDark,
                       ),
@@ -130,21 +143,23 @@ class CreateAccScreen extends StatelessWidget {
                       ),
                     ),
                     const SizedBox(height: 20),
-                    CustomDropDownButton<String>(
-                      list: c.cityList
-                          .map((e) => '${e.name}, ${e.stateName}')
-                          .toList(),
-                      value: c.cityVal,
-                      onChanged: (value) {
-                        c.cityVal = value;
-                        logger.d(value);
-                      },
-                      hintText: 'Select Your City',
-                      validator: (value) => ValidationFunc.categoryValidation(
-                        category: value,
-                        title: 'your city',
-                      ),
-                    ),
+                    Obx(() {
+                      return OptimizedDropDownMenu<String>(
+                        list: c.cityList
+                            .map((e) => '${e.name}, ${e.stateName}')
+                            .toList(),
+                        value: c.cityVal.value,
+                        onChanged: (value) {
+                          c.cityVal.value = value;
+                          logger.d(value);
+                        },
+                        hintText: 'Select Your City',
+                        validator: (value) => ValidationFunc.categoryValidation(
+                          category: value,
+                          title: 'your city',
+                        ),
+                      );
+                    }),
                     const SizedBox(height: 20),
                     Text(
                       'Visiting Card / GST Certificate',
@@ -176,6 +191,12 @@ class CreateAccScreen extends StatelessWidget {
                             // padding: EdgeInsets.symmetric(vertical: 32),
                           ),
                           child: Obx(() {
+                            if (user.appUser().image.isNotEmpty) {
+                              return CacheImage(
+                                url:
+                                    '${UrlConst.baseUrl}/storage/app/public/product/${user.appUser().image}',
+                              );
+                            }
                             if (c.filePath().isNotEmpty) {
                               final ext = c.filePath().toLowerCase();
                               final isPdf = ext.endsWith('.pdf');
@@ -253,7 +274,9 @@ class CreateAccScreen extends StatelessWidget {
                     Obx(() {
                       return AuthElevatedButton(
                         isLoading: c.isButtonLoading(),
-                        title: 'Sign Up',
+                        title: user.appUser().businessName.isNotEmpty
+                            ? 'Update'
+                            : 'Sign Up',
                         onPressed: () async {
                           if (c.formKey.currentState?.validate() ?? false) {
                             c.signup();

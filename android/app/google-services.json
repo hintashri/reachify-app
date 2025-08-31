@@ -1,0 +1,39 @@
+{
+  "project_info": {
+    "project_number": "19742522208",
+    "project_id": "reachify-74587",
+    "storage_bucket": "reachify-74587.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:19742522208:android:c84d0b6dcb4aae46c37c05",
+        "android_client_info": {
+          "package_name": "com.india.reachify"
+        }
+      },
+      "oauth_client": [
+        {
+          "client_id": "19742522208-pi2427klr70iv8npr7vt5l9nfgfmqfdg.apps.googleusercontent.com",
+          "client_type": 3
+        }
+      ],
+      "api_key": [
+        {
+          "current_key": "AIzaSyCEDJmZdcYck4TgAfpnq8e--06tnsu4KF4"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": [
+            {
+              "client_id": "19742522208-pi2427klr70iv8npr7vt5l9nfgfmqfdg.apps.googleusercontent.com",
+              "client_type": 3
+            }
+          ]
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

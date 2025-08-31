@@ -2,7 +2,6 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:like_button/like_button.dart';
 import 'package:reachify_app/models/product_model.dart';
-import 'package:reachify_app/modules/products/category_ctrl.dart';
 import 'package:reachify_app/modules/products/wishlist_ctrl.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
@@ -10,33 +9,26 @@ import 'package:reachify_app/utils/const/enums.dart';
 import 'package:reachify_app/utils/const/logger.dart';
 import 'package:reachify_app/utils/const/url_const.dart';
 import 'package:reachify_app/utils/functions/url_luncher.dart';
+import 'package:reachify_app/utils/widgets/buttons/app_back_button.dart';
+import 'package:reachify_app/utils/widgets/cache_image.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ProductDetailScreen extends StatelessWidget {
-  final CategoryCtrl c = Get.find<CategoryCtrl>();
-
   ProductDetailScreen({super.key});
 
-  final int index = Get.arguments;
+  final int index = Get.arguments['index'];
+  final List<ProductModel> list = Get.arguments['list'];
 
   @override
   Widget build(BuildContext context) {
-    logger.d(c.productList[index].toJson());
+    logger.d(list[index].toJson());
     return Scaffold(
-      appBar: AppBar(title: const Text('Category')),
+      appBar: AppBar(leading: const AppBackButton()),
       body: ScrollablePositionedList.builder(
-        initialScrollIndex: index, // <-- magic here
-        itemCount: c.productList.length,
+        initialScrollIndex: index,
+        itemCount: list.length,
         itemBuilder: (context, index) {
-          final item = c.productList[index];
-          return ProductDetailCard(
-            model: item,
-            // imageUrl:
-            //     '${UrlConst.baseUrl}/storage/app/public/product/${item.images.first}',
-            // shopName: 'Rajan Polyplast',
-            // city: 'Rajkot',
-            // ownerName: 'Mr. Chiragbhai Patel',
-          );
+          return ProductDetailCard(model: list[index]);
         },
       ),
       // ListView(
@@ -88,15 +80,25 @@ class ProductDetailCard extends StatelessWidget {
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
-            ClipRRect(
-              borderRadius: BorderRadius.circular(12),
-              child: Image.network(
-                '${UrlConst.baseUrl}/storage/app/public/product/${model.images.first}',
-                height: 180,
-                width: double.infinity,
-                fit: BoxFit.cover,
+            Card(
+              elevation: 5,
+              shape: RoundedRectangleBorder(
+                borderRadius: BorderRadius.circular(12),
+              ),
+              margin: EdgeInsets.zero,
+              child: ClipRRect(
+                borderRadius: BorderRadius.circular(12),
+                child: CacheImage(
+                  url:
+                      '${UrlConst.baseUrl}/storage/app/public/product/${model.images.first}',
+
+                  // height: 180,
+                  // width: double.infinity,
+                  // fit: BoxFit.cover,
+                ),
               ),
             ),
+            const SizedBox(height: 6),
             Text(
               '${model.seller.companyName} - ${model.seller.companyAddress}',
               style: context.textTheme.headlineSmall?.copyWith(fontSize: 15),
@@ -120,22 +122,19 @@ class ProductDetailCard extends StatelessWidget {
 
             /// Action buttons row
             Row(
+              mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
                 WhatsappButton(whatsapp: model.seller.whatsappLink),
-                const SizedBox(width: 10),
                 SocialButton(
                   type: LaunchType.call,
                   // asset: AssetConst.call,
                   data: model.seller.phoneNumber,
                 ),
-                const SizedBox(width: 10),
                 SocialButton(data: model.seller.email, type: LaunchType.mail),
-                const SizedBox(width: 10),
                 SocialButton(
                   data: model.seller.website,
                   type: LaunchType.website,
                 ),
-                const SizedBox(width: 10),
                 CustomLikeButton(model: model),
               ],
             ),
@@ -170,7 +169,9 @@ class SocialButton extends StatelessWidget {
           },
       borderRadius: BorderRadius.circular(10),
       child: Container(
-        padding: const EdgeInsets.all(8),
+        height: 35,
+        width: 35,
+        // padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: AppColors.iconColor, width: 1),
@@ -210,21 +211,23 @@ class CustomLikeButton extends StatelessWidget {
         (item) => item.id == model.id,
       );
       return Container(
-        padding: const EdgeInsets.all(8),
+        height: 35,
+        width: 35,
+        // padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: AppColors.iconColor, width: 1),
         ),
         child: LikeButton(
-          size: 40,
+          size: 18,
+          likeCountPadding: EdgeInsets.zero,
+          padding: EdgeInsets.zero,
           isLiked: isInWishlist,
           // adjust size
           likeBuilder: (bool isLiked) {
-            return Image.asset(
-              isLiked ? AssetConst.likeFill : AssetConst.like,
-              width: 30,
-              height: 30,
-            );
+            return isLiked
+                ? const Icon(Icons.favorite, color: Colors.red, size: 20)
+                : Image.asset(AssetConst.like);
           },
           // optional animation circle & bubbles customization
           circleColor: const CircleColor(
@@ -256,27 +259,32 @@ class WhatsappButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return InkWell(
-      onTap: () {},
-      borderRadius: BorderRadius.circular(10),
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          borderRadius: BorderRadius.circular(10),
-          color: Colors.green,
-        ),
-        child: Row(
-          children: [
-            Image.asset(AssetConst.whatsapp),
-            const SizedBox(width: 3),
-            Text(
-              'WhatsApp',
-              style: context.textTheme.labelSmall?.copyWith(
-                fontWeight: FontWeight.w600,
-                color: Colors.white,
+    return Material(
+      color: Colors.transparent,
+      child: InkWell(
+        onTap: () {
+          urlLaunch(LaunchType.whatsapp, value: whatsapp);
+        },
+        borderRadius: BorderRadius.circular(10),
+        child: Container(
+          padding: const EdgeInsets.all(8),
+          decoration: BoxDecoration(
+            borderRadius: BorderRadius.circular(10),
+            color: Colors.green,
+          ),
+          child: Row(
+            children: [
+              Image.asset(AssetConst.whatsapp),
+              const SizedBox(width: 3),
+              Text(
+                'WhatsApp',
+                style: context.textTheme.labelSmall?.copyWith(
+                  fontWeight: FontWeight.w600,
+                  color: Colors.white,
+                ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

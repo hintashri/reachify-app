@@ -1,10 +1,17 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
+import 'package:reachify_app/configuration/notification_config.dart';
 import 'package:reachify_app/configuration/user_config.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
+import 'package:reachify_app/utils/const/enums.dart';
+import 'package:reachify_app/utils/const/key_const.dart';
 import 'package:reachify_app/utils/functions/app_func.dart';
+import 'package:reachify_app/utils/functions/register_dialog.dart';
+import 'package:reachify_app/utils/functions/url_luncher.dart';
+import 'package:reachify_app/utils/widgets/web_view_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
   final GlobalKey<ScaffoldState> scaffoldKey;
@@ -37,7 +44,7 @@ class CustomDrawer extends StatelessWidget {
                 const SizedBox(width: 12),
                 Expanded(
                   child: Text(
-                    'Hi, ${user.appUser.businessName.isNotEmpty ? user.appUser.businessName : user.appUser.name}',
+                    'Hi, ${user.appUser().businessName.isNotEmpty ? user.appUser().businessName : user.appUser().name}',
                     style: context.textTheme.labelMedium?.copyWith(
                       fontWeight: FontWeight.w600,
                     ),
@@ -68,10 +75,18 @@ class CustomDrawer extends StatelessWidget {
                     assetIcon: AssetConst.promote,
                     title: 'Promote Your Brand',
                     onTap: () {
-                      Get.toNamed(
-                        AppRoutes.promoteBrand,
-                        arguments: 'Promote Your Brand',
+                      Get.back();
+                      Get.to(
+                        () => const WebViewScreen(
+                          url: KeyConst.promoteYourBrand,
+                          title: 'Promote Your Brand',
+                        ),
                       );
+
+                      // Get.toNamed(
+                      //   AppRoutes.promoteBrand,
+                      //   arguments: 'Promote Your Brand',
+                      // );
                     },
                   ),
                   drawerTile(
@@ -86,28 +101,50 @@ class CustomDrawer extends StatelessWidget {
                     context: context,
                     assetIcon: AssetConst.menu,
                     title: 'Social Media',
-                    onTap: () {},
+                    onTap: () async {
+                      if (user.userVerified) {
+                        await AppFunc.appPopUp(
+                          title: 'Stay Updated on Every Platform',
+                          desc: 'don’t miss any important update.',
+                          buttonName: 'Close',
+                          child: const SocialMediaWidget(),
+                          buttonTap: Get.back,
+                        );
+                      } else {
+                        registerDialogue();
+                      }
+                    },
                   ),
                   drawerTile(
                     context: context,
                     assetIcon: AssetConst.notification,
                     title: 'Notification Settings',
-                    onTap: () {},
+                    onTap: () {
+                      if (user.userVerified) {
+                      } else {
+                        registerDialogue();
+                      }
+                    },
                   ),
                   drawerTile(
                     context: context,
                     assetIcon: AssetConst.aboutUs,
                     title: 'About Us',
-                    onTap: () {},
+                    onTap: () {
+                      urlLaunch(LaunchType.website, value: KeyConst.aboutUs);
+                    },
                   ),
                   drawerTile(
                     context: context,
                     assetIcon: AssetConst.contactUs,
                     title: 'Contact Us',
                     onTap: () {
-                      Get.toNamed(
-                        AppRoutes.promoteBrand,
-                        arguments: 'Contact Us',
+                      Get.back();
+                      Get.to(
+                        () => const WebViewScreen(
+                          url: KeyConst.contactUs,
+                          title: 'Contact Us',
+                        ),
                       );
                     },
                   ),
@@ -134,6 +171,29 @@ class CustomDrawer extends StatelessWidget {
                 ],
               ),
             ),
+          ),
+
+          FutureBuilder(
+            future: NotificationServices.getToken(),
+            builder: (context, snapshot) {
+              if (snapshot.hasData && snapshot.data != null) {
+                return Row(
+                  children: [
+                    Expanded(child: SelectableText('${snapshot.data}')),
+                    IconButton(
+                      onPressed: () async {
+                        await Clipboard.setData(
+                          ClipboardData(text: snapshot.data ?? ''),
+                        );
+                      },
+                      icon: const Icon(Icons.copy),
+                    ),
+                  ],
+                );
+              } else {
+                return const SizedBox();
+              }
+            },
           ),
 
           // Footer
@@ -173,6 +233,100 @@ class CustomDrawer extends StatelessWidget {
         color: AppColors.textDark,
       ),
       onTap: onTap,
+    );
+  }
+}
+
+class SocialMediaWidget extends StatelessWidget {
+  const SocialMediaWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Column(
+      children: [
+        SizedBox(height: 25),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ShareIcon(
+              image: AssetConst.whatsappIc,
+              name: 'WhatsApp Community',
+              url: KeyConst.whatsappCommunity,
+            ),
+            ShareIcon(
+              image: AssetConst.whatsappIc,
+              name: 'WhatsApp Channel',
+              url: KeyConst.whatsappChannel,
+            ),
+            ShareIcon(
+              image: AssetConst.instaIc,
+              name: 'Instagram',
+              url: KeyConst.instagram,
+            ),
+          ],
+        ),
+        SizedBox(height: 20),
+        Row(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            ShareIcon(
+              image: AssetConst.facebookIc,
+              name: 'Facebook',
+              url: KeyConst.facebook,
+            ),
+            ShareIcon(
+              image: AssetConst.pinterestIc,
+              name: 'Pinterest',
+              url: KeyConst.pinterest,
+            ),
+            ShareIcon(
+              image: AssetConst.linkedinIc,
+              name: 'linkedin',
+              url: KeyConst.linkedin,
+            ),
+          ],
+        ),
+        // SizedBox(height: 10),
+      ],
+    );
+  }
+}
+
+class ShareIcon extends StatelessWidget {
+  final String image;
+  final String name;
+  final String url;
+
+  const ShareIcon({
+    super.key,
+    required this.image,
+    required this.name,
+    required this.url,
+  });
+
+  @override
+  Widget build(BuildContext context) {
+    return Expanded(
+      child: Center(
+        child: GestureDetector(
+          onTap: () => urlLaunch(LaunchType.website, value: url),
+          child: Column(
+            mainAxisAlignment: MainAxisAlignment.start,
+            children: [
+              Image.asset(image, height: 40, width: 40),
+              const SizedBox(height: 10),
+              Text(
+                name,
+                textAlign: TextAlign.center,
+                style: const TextStyle(fontWeight: FontWeight.w600),
+                maxLines: 3,
+                overflow: TextOverflow.ellipsis,
+                softWrap: true,
+              ),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

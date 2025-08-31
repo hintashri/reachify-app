@@ -6,17 +6,21 @@ import 'package:reachify_app/utils/const/url_const.dart';
 import 'package:reachify_app/utils/widgets/cache_image.dart';
 
 class ProductCard extends StatelessWidget {
-  final ProductModel product;
+  final List<ProductModel> list;
   final int index;
 
-  const ProductCard({super.key, required this.product, required this.index});
+  const ProductCard({super.key, required this.list, required this.index});
 
   @override
   Widget build(BuildContext context) {
+    final ProductModel product = list[index];
     return InkWell(
       borderRadius: BorderRadius.circular(12),
       onTap: () async {
-        Get.toNamed(AppRoutes.productDetail, arguments: index);
+        Get.toNamed(
+          AppRoutes.productDetail,
+          arguments: {'index': index, 'list': list},
+        );
       },
       child: Card(
         shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(12)),

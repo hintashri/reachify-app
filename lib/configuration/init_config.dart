@@ -2,6 +2,7 @@ import 'dart:io';
 
 import 'package:connectivity_plus/connectivity_plus.dart';
 import 'package:device_info_plus/device_info_plus.dart';
+import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -14,6 +15,8 @@ import 'package:reachify_app/utils/const/logger.dart';
 import 'package:reachify_app/utils/const/url_const.dart';
 import 'package:reachify_app/utils/functions/app_func.dart';
 
+import 'notification_config.dart';
+
 final InitConfig init = InitConfig.instance;
 
 class InitConfig extends GetxService {
@@ -23,8 +26,8 @@ class InitConfig extends GetxService {
 
   Future<void> initCall() async {
     WidgetsFlutterBinding.ensureInitialized();
-    // await Firebase.initializeApp();
-    // NotificationServices.initNotification();
+    await Firebase.initializeApp();
+    NotificationServices.initNotification();
     await _setOrientation();
     await _initGetStorage();
     await _getPackageInfo();

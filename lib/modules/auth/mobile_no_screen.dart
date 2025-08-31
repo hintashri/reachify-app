@@ -8,12 +8,16 @@ import 'package:reachify_app/models/country_model.dart';
 import 'package:reachify_app/modules/auth/mobile_no_ctrl.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
+import 'package:reachify_app/utils/const/enums.dart';
+import 'package:reachify_app/utils/const/key_const.dart';
 import 'package:reachify_app/utils/const/logger.dart';
+import 'package:reachify_app/utils/functions/url_luncher.dart';
 import 'package:reachify_app/utils/functions/validation_func.dart';
 import 'package:reachify_app/utils/widgets/buttons/auth_elevated_button.dart';
 import 'package:reachify_app/utils/widgets/country_code.dart';
 import 'package:reachify_app/utils/widgets/custom_dropdown.dart';
 import 'package:reachify_app/utils/widgets/loading_view.dart';
+
 import '../../utils/widgets/auth_textfield.dart';
 
 class MobileNoScreen extends StatelessWidget {
@@ -145,7 +149,12 @@ class MobileNoScreen extends StatelessWidget {
                                   decorationColor: AppColors.lightPrimary,
                                 ),
                                 recognizer: TapGestureRecognizer()
-                                  ..onTap = () {},
+                                  ..onTap = () {
+                                    urlLaunch(
+                                      LaunchType.website,
+                                      value: KeyConst.termsCondition,
+                                    );
+                                  },
                               ),
                               TextSpan(
                                 text: ' and ',
@@ -162,7 +171,12 @@ class MobileNoScreen extends StatelessWidget {
                                   decorationColor: AppColors.lightPrimary,
                                 ),
                                 recognizer: TapGestureRecognizer()
-                                  ..onTap = () {},
+                                  ..onTap = () {
+                                    urlLaunch(
+                                      LaunchType.website,
+                                      value: KeyConst.privacyPolicy,
+                                    );
+                                  },
                               ),
                             ],
                           ),

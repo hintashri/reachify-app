@@ -4,6 +4,8 @@ import 'package:reachify_app/modules/home/home_ctrl.dart';
 import 'package:reachify_app/utils/const/url_const.dart';
 import 'package:reachify_app/utils/widgets/cache_image.dart';
 
+import '../../routes/app_routes.dart';
+
 class SearchListScreen extends StatelessWidget {
   final HomeCtrl c = Get.find<HomeCtrl>();
 
@@ -14,6 +16,7 @@ class SearchListScreen extends StatelessWidget {
     return Scaffold(
       appBar: AppBar(title: const Text('Search Item')),
       body: SafeArea(
+        bottom: false,
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
@@ -26,7 +29,7 @@ class SearchListScreen extends StatelessWidget {
             ),
             Expanded(
               child: GridView.builder(
-                padding: const EdgeInsets.fromLTRB(16, 10, 16, 10),
+                padding: const EdgeInsets.fromLTRB(16, 10, 16, 20),
                 gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
                   crossAxisCount: 2,
                   childAspectRatio: 1,
@@ -36,14 +39,23 @@ class SearchListScreen extends StatelessWidget {
                 itemCount: c.searchList.length,
                 itemBuilder: (context, index) {
                   final model = c.searchList[index];
-                  return ClipRRect(
-                    clipBehavior: Clip.antiAlias,
+                  return InkWell(
+                    onTap: () {
+                      Get.toNamed(
+                        AppRoutes.productDetail,
+                        arguments: {'index': index, 'list': c.searchList},
+                      );
+                    },
                     borderRadius: BorderRadius.circular(12),
-                    child: CacheImage(
-                      url:
-                          '${UrlConst.baseUrl}/storage/app/public/product/${model.images.first}',
-                      height: 120,
-                      width: 120,
+                    child: ClipRRect(
+                      clipBehavior: Clip.antiAlias,
+                      borderRadius: BorderRadius.circular(12),
+                      child: CacheImage(
+                        url:
+                            '${UrlConst.baseUrl}/storage/app/public/product/${model.images.first}',
+                        height: 120,
+                        width: 120,
+                      ),
                     ),
                   );
                 },

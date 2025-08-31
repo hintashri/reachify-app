@@ -16,11 +16,11 @@ class CategoryCtrl extends GetxController {
 
   String get categoryName =>
       init.categoryList
-          .where((e) => e.id == user.appUser.selectedCategory)
+          .where((e) => e.id == user.appUser().selectedCategory)
           .isEmpty
       ? ''
       : init.categoryList
-            .where((e) => e.id == user.appUser.selectedCategory)
+            .where((e) => e.id == user.appUser().selectedCategory)
             .first
             .name;
 

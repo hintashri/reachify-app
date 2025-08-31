@@ -1,4 +1,5 @@
 import 'package:reachify_app/utils/const/enums.dart';
+import 'package:reachify_app/utils/const/logger.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 Future<void> urlLaunch(
@@ -9,11 +10,16 @@ Future<void> urlLaunch(
   String? body,
 }) async {
   Uri uri;
+  logger.d('URL Launcher $value\n Type :$type');
 
   switch (type) {
     case LaunchType.call:
       uri = Uri(scheme: 'tel', path: value);
-      break;
+      if (!await launchUrl(uri, mode: LaunchMode.platformDefault)) {
+        logger.d('Could not launch $uri');
+        // throw 'Could not launch $uri';
+      }
+      return;
 
     case LaunchType.whatsapp:
       uri = Uri.parse(
@@ -22,7 +28,10 @@ Future<void> urlLaunch(
       break;
 
     case LaunchType.website:
-      uri = Uri.parse(value);
+      final String formattedUrl = value.startsWith('http')
+          ? value
+          : 'https://${value.replaceAll(RegExp(r'^/+'), '')}';
+      uri = Uri.parse(formattedUrl);
       break;
 
     case LaunchType.mail:
@@ -32,10 +41,20 @@ Future<void> urlLaunch(
         query:
             'subject=${Uri.encodeComponent(subject ?? '')}&body=${Uri.encodeComponent(body ?? '')}',
       );
-      break;
+      // Use platformDefault for mailto
+      if (!await launchUrl(
+        uri,
+        mode: LaunchType.website == type
+            ? LaunchMode.inAppWebView
+            : LaunchMode.platformDefault,
+      )) {
+        logger.d('Could not launch $uri');
+      }
+      return;
   }
 
-  if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-    throw 'Could not launch $uri';
-  }
+  // For website & whatsapp use externalApplication
+  // if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+  //   throw 'Could not launch $uri';
+  // }
 }

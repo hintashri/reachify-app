@@ -12,6 +12,19 @@ class KeyConst {
       'https://play.google.com/store/apps/details?id=(bundle_name)';
   static const rateUsIOS = 'https://apps.apple.com/us/app/(app_name)/(app_id)';
 
-  static const termsCondition = 'url';
-  static const privacyPolicy = 'url';
+  static const promoteYourBrand =
+      'https://admin.reachifymedia.com/advertiswithus';
+  static const contactUs = 'https://admin.reachifymedia.com/contacts';
+  static const aboutUs = 'https://admin.reachifymedia.com/about-us';
+
+  static const termsCondition = 'https://admin.reachifymedia.com/terms';
+  static const privacyPolicy = 'https://admin.reachifymedia.com/privacy-policy';
+
+  /// Social Links
+  static const instagram = 'url';
+  static const facebook = 'url';
+  static const linkedin = 'url';
+  static const pinterest = 'url';
+  static const whatsappChannel = 'url';
+  static const whatsappCommunity = 'url';
 }

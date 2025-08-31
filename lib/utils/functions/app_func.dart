@@ -1,4 +1,5 @@
 import 'dart:ui';
+
 import 'package:animate_do/animate_do.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
@@ -23,6 +24,7 @@ class AppFunc {
     String? assetName,
     String? buttonName,
     VoidCallback? buttonTap,
+    Widget? child,
     required String title,
     required String desc,
   }) {
@@ -88,11 +90,13 @@ class AppFunc {
                             ),
                             textAlign: TextAlign.center,
                           ),
+                          if (child != null) ...[child],
+
                           if (buttonName != null) ...[
                             const SizedBox(height: 30),
                             AuthElevatedButton(
                               title: buttonName,
-                              onPressed: buttonTap
+                              onPressed: buttonTap,
                             ),
                           ],
                         ],

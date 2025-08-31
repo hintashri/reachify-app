@@ -1,7 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reachify_app/modules/products/wishlist_ctrl.dart';
-import 'package:reachify_app/utils/widgets/buttons/app_back_button.dart';
 import 'package:reachify_app/utils/widgets/empty_view.dart';
 import 'package:reachify_app/utils/widgets/product_card.dart';
 
@@ -16,7 +15,7 @@ class WishlistScreen extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        leading: const AppBackButton(),
+        // leading: const AppBackButton(),
         centerTitle: true,
         title: Text('Wishlist', style: context.textTheme.labelLarge),
       ),
@@ -37,8 +36,7 @@ class WishlistScreen extends StatelessWidget {
             ),
             itemCount: c.productList.length,
             itemBuilder: (context, index) {
-              final item = c.productList[index];
-              return ProductCard(product: item, index: index);
+              return ProductCard(index: index, list: c.productList);
             },
           );
         }

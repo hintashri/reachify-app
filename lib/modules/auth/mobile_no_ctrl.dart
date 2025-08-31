@@ -1,4 +1,5 @@
 import 'dart:convert';
+
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart' hide Response;
@@ -9,6 +10,7 @@ import 'package:reachify_app/models/user_model.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/utils/const/url_const.dart';
 import 'package:reachify_app/utils/functions/app_func.dart';
+
 import '../../configuration/network_config.dart';
 import '../../utils/const/logger.dart';
 
@@ -112,7 +114,7 @@ class MobileNoCtrl extends GetxController {
             final UserModel appUser = await user.getUserFromApi();
             appUser.token = token;
             user.setUser(appUser);
-            if (user.appUser.businessName.isNotEmpty) {
+            if (user.appUser().businessName.isNotEmpty) {
               Get.offAllNamed(AppRoutes.home);
             } else {
               Get.offAllNamed(AppRoutes.createAcc, arguments: [true]);

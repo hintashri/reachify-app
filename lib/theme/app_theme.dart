@@ -37,7 +37,7 @@ class AppTheme {
         fontWeight: FontWeight.bold,
       ),
       headlineSmall: TextStyle(fontSize: 24, fontWeight: FontWeight.bold),
-      labelLarge: TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
+      labelLarge: TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
       labelMedium: TextStyle(fontSize: 16, fontWeight: FontWeight.normal),
       labelSmall: TextStyle(fontSize: 14, fontWeight: FontWeight.normal),
     ),

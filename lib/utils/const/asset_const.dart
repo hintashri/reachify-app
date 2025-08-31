@@ -32,4 +32,10 @@ class AssetConst {
   static const String mail = '$icons/detail_icons/mail.png';
   static const String web = '$icons/detail_icons/web.png';
   static const String whatsapp = '$icons/detail_icons/whatsapp.png';
+
+  static const String facebookIc = '$icons/social/facebook_ic.png';
+  static const String instaIc = '$icons/social/insta_ic.png';
+  static const String linkedinIc = '$icons/social/linkedin_ic.png';
+  static const String pinterestIc = '$icons/social/pinterest_ic.png';
+  static const String whatsappIc = '$icons/social/whatsapp_ic.png';
 }

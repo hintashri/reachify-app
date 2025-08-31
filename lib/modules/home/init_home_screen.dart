@@ -1,9 +1,13 @@
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
+import 'package:reachify_app/configuration/user_config.dart';
 import 'package:reachify_app/modules/home/home_screen.dart';
 import 'package:reachify_app/modules/home/init_home_ctrl.dart';
+import 'package:reachify_app/modules/products/wishlist_screen.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
+import 'package:reachify_app/utils/functions/app_func.dart';
+import 'package:reachify_app/utils/functions/register_dialog.dart';
 import 'package:reachify_app/utils/widgets/buttons/nav_bar_button.dart';
 import 'package:reachify_app/utils/widgets/custom_drawer.dart';
 
@@ -32,7 +36,15 @@ class InitHomeScreen extends StatelessWidget {
         onNotification: c.handleScrollNotification,
         child: Column(
           children: [
-            Expanded(child: HomeScreen()),
+            Expanded(
+              child: Obx(() {
+                if (c.activeTab() == 1) {
+                  return WishlistScreen();
+                } else {
+                  return HomeScreen();
+                }
+              }),
+            ),
             SlideTransition(
               position: c.offsetAnimation,
               child: Container(
@@ -65,28 +77,44 @@ class InitHomeScreen extends StatelessWidget {
                       assetName: AssetConst.like,
                       index: 1,
                       onTap: () {
-                        c.activeTab(1);
+                        if (user.userVerified) {
+                          Get.toNamed(AppRoutes.wishlist);
+                          // c.activeTab(1);
+                        } else {
+                          registerDialogue();
+                        }
                       },
                     ),
                     NavBarButton(
                       assetName: AssetConst.search,
                       index: 2,
                       onTap: () {
-                        c.activeTab(2);
+                        if (user.userVerified) {
+                          c.activeTab(2);
+                        } else {
+                          registerDialogue();
+                        }
                       },
                     ),
                     NavBarButton(
                       assetName: AssetConst.menu,
                       index: 3,
-                      onTap: () {
-                        _scaffoldKey.currentState?.openDrawer();
+                      onTap: () async {
+                        await AppFunc.appPopUp(
+                          title: 'Stay Updated on Every Platform',
+                          desc: 'don’t miss any important update.',
+                          buttonName: 'Close',
+                          child: const SocialMediaWidget(),
+                          buttonTap: Get.back,
+                        );
                       },
                     ),
                     NavBarButton(
                       assetName: AssetConst.user,
                       index: 4,
                       onTap: () {
-                        Get.toNamed(AppRoutes.createAcc);
+                        _scaffoldKey.currentState?.openDrawer();
+                        // Get.toNamed(AppRoutes.createAcc);
                       },
                     ),
                   ],
