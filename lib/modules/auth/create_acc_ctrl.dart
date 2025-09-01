@@ -7,6 +7,7 @@ import 'package:reachify_app/configuration/init_config.dart';
 import 'package:reachify_app/configuration/network_config.dart';
 import 'package:reachify_app/configuration/user_config.dart';
 import 'package:reachify_app/models/city_model.dart';
+import 'package:reachify_app/models/user_model.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/utils/const/url_const.dart';
 import 'package:reachify_app/utils/extensions/date_extension.dart';
@@ -198,7 +199,7 @@ class CreateAccCtrl extends GetxController {
 
   Future<void> signup() async {
     try {
-      if (filePath().isNotEmpty) {
+      if (filePath().isNotEmpty || user.appUser().image.isNotEmpty) {
         isButtonLoading(true);
         final List<String> allVal = cityVal.split(', ') ?? [];
         final String str1 = allVal.first;
@@ -221,14 +222,19 @@ class CreateAccCtrl extends GetxController {
             'city': cityVal,
             'business_category': typeVal ?? '',
             'business_name': bNameController.text.trim(),
-            'image': await MultipartFile.fromFile(
-              filePath(),
-              filename: 'doc_img_${DateTime.now().microsecondsSinceEpoch}.png',
-            ),
+            if (filePath.isNotEmpty)
+              'image': await MultipartFile.fromFile(
+                filePath(),
+                filename:
+                    'doc_img_${DateTime.now().microsecondsSinceEpoch}.png',
+              ),
           },
           isRaw: false,
         );
         if (net.successfulRes(response: response)) {
+          final UserModel appUser = await user.getUserFromApi();
+          appUser.token = user.appUser().token;
+          user.setUser(appUser);
           logger.d(response);
           Get.offAllNamed(AppRoutes.home);
         } else {

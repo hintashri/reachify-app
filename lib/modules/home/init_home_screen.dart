@@ -3,7 +3,6 @@ import 'package:get/get.dart';
 import 'package:reachify_app/configuration/user_config.dart';
 import 'package:reachify_app/modules/home/home_screen.dart';
 import 'package:reachify_app/modules/home/init_home_ctrl.dart';
-import 'package:reachify_app/modules/products/wishlist_screen.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
 import 'package:reachify_app/utils/functions/app_func.dart';
@@ -36,15 +35,7 @@ class InitHomeScreen extends StatelessWidget {
         onNotification: c.handleScrollNotification,
         child: Column(
           children: [
-            Expanded(
-              child: Obx(() {
-                if (c.activeTab() == 1) {
-                  return WishlistScreen();
-                } else {
-                  return HomeScreen();
-                }
-              }),
-            ),
+            Expanded(child: HomeScreen()),
             SlideTransition(
               position: c.offsetAnimation,
               child: Container(
@@ -77,6 +68,7 @@ class InitHomeScreen extends StatelessWidget {
                       assetName: AssetConst.like,
                       index: 1,
                       onTap: () {
+                        // c.activeTab(0);
                         if (user.userVerified) {
                           Get.toNamed(AppRoutes.wishlist);
                           // c.activeTab(1);

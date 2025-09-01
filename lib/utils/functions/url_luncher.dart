@@ -42,19 +42,43 @@ Future<void> urlLaunch(
             'subject=${Uri.encodeComponent(subject ?? '')}&body=${Uri.encodeComponent(body ?? '')}',
       );
       // Use platformDefault for mailto
-      if (!await launchUrl(
-        uri,
-        mode: LaunchType.website == type
-            ? LaunchMode.inAppWebView
-            : LaunchMode.platformDefault,
-      )) {
+      if (!await launchUrl(uri, mode: LaunchMode.platformDefault)) {
         logger.d('Could not launch $uri');
       }
       return;
   }
 
-  // For website & whatsapp use externalApplication
-  // if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-  //   throw 'Could not launch $uri';
-  // }
+  // For website & whatsapp - try inAppWebView first, fallback to external
+  try {
+    if (type == LaunchType.website) {
+      // First check if the URL can be launched
+      if (await canLaunchUrl(uri)) {
+        bool launched = await launchUrl(
+          uri,
+          mode: LaunchMode.inAppWebView,
+          webViewConfiguration: const WebViewConfiguration(
+            enableJavaScript: true,
+            enableDomStorage: true,
+          ),
+        );
+
+        if (!launched) {
+          logger.d('InAppWebView failed, trying external application');
+          // Fallback to external application
+          await launchUrl(uri, mode: LaunchMode.externalApplication);
+        }
+      } else {
+        logger.d('Cannot launch URL: $uri');
+        throw 'Cannot launch URL: $uri';
+      }
+    } else {
+      // For WhatsApp, use external application
+      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
+        logger.d('Could not launch $uri');
+        throw 'Could not launch $uri';
+      }
+    }
+  } catch (e) {
+    logger.d('Error launching URL: $e');
+  }
 }

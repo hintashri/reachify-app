@@ -29,6 +29,7 @@ class HomeScreen extends StatelessWidget {
         return SingleChildScrollView(
           child: Column(
             children: [
+              const SizedBox(height: 13),
               Obx(() {
                 return SafeArea(
                   bottom: false,

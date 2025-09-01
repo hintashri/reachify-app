@@ -19,7 +19,7 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return GetMaterialApp(
       debugShowCheckedModeBanner: false,
-      title: 'Reachify App',
+      title: ' App',
       enableLog: true,
       scrollBehavior: const ScrollBehavior().copyWith(
         physics: const BouncingScrollPhysics(),
