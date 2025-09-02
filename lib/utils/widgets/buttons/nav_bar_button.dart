@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:reachify_app/modules/home/init_home_ctrl.dart';
 import 'package:reachify_app/modules/products/wishlist_ctrl.dart';
+import 'package:reachify_app/utils/widgets/svg_image.dart';
 
 class NavBarButton extends StatelessWidget {
   final InitHomeCtrl c = Get.find<InitHomeCtrl>();
@@ -21,19 +22,27 @@ class NavBarButton extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return GestureDetector(
-      onTap: onTap,
-      child: Obx(() {
-        final bool isActive = c.activeTab() == index;
-        final bool isFavorite = index == 1;
-        return Container(
+    final bool isActive = index == 0;
+    final bool isFavorite = index == 1;
+
+    return Material(
+      borderRadius: BorderRadius.circular(50),
+      color: isActive
+          ? const Color.fromRGBO(133, 133, 133, 0.12)
+          : Colors.transparent,
+      child: InkWell(
+        borderRadius: BorderRadius.circular(50),
+        onTap: onTap,
+        child: Container(
           height: 50,
           width: 50,
-          decoration: BoxDecoration(
+          decoration: const BoxDecoration(
             shape: BoxShape.circle,
-            color: isActive ? const Color.fromRGBO(133, 133, 133, 0.12) : null,
+            // color: isActive ? const Color.fromRGBO(133, 133, 133, 0.12) : null,
           ),
           child: Obx(() {
+            final Widget icon = SVGImage(assetName, height: 24, width: 24);
+
             if (wishlistCtrl.productList.isNotEmpty && isFavorite) {
               return Center(
                 child: badges.Badge(
@@ -43,15 +52,15 @@ class NavBarButton extends StatelessWidget {
                     '${wishlistCtrl.productList.length}',
                     style: const TextStyle(color: Colors.white, fontSize: 10),
                   ),
-                  child: Image.asset(assetName, height: 24),
+                  child: icon,
                 ),
               );
             } else {
-              return Image.asset(assetName, height: 24);
+              return Center(child: icon); // no FittedBox needed
             }
           }),
-        );
-      }),
+        ),
+      ),
     );
   }
 }

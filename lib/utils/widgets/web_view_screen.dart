@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:get/get.dart';
 import 'package:webview_flutter/webview_flutter.dart';
+
+import 'buttons/app_back_button.dart';
 
 class WebViewScreen extends StatefulWidget {
   final String url;
@@ -26,7 +29,15 @@ class _WebViewScreenState extends State<WebViewScreen> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text(widget.title)),
+      appBar: AppBar(
+        leading: const AppBackButton(),
+        centerTitle: true,
+        title: Text(
+          widget.title,
+          style: context.textTheme.labelLarge,
+          // style: context.textTheme.labelLarge?.copyWith(fontSize: 22),
+        ),
+      ),
       body: WebViewWidget(controller: controller),
     );
   }

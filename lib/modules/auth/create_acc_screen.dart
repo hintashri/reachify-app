@@ -18,6 +18,7 @@ import 'package:reachify_app/utils/widgets/buttons/auth_elevated_button.dart';
 import 'package:reachify_app/utils/widgets/cache_image.dart';
 import 'package:reachify_app/utils/widgets/custom_dropdown.dart';
 import 'package:reachify_app/utils/widgets/loading_view.dart';
+import 'package:reachify_app/utils/widgets/svg_image.dart';
 
 import '../../utils/widgets/auth_textfield.dart';
 
@@ -248,10 +249,7 @@ class CreateAccScreen extends StatelessWidget {
                                   ),
                                   child: Column(
                                     children: [
-                                      Image.asset(
-                                        AssetConst.upload,
-                                        height: 44,
-                                      ),
+                                      SVGImage(AssetConst.upload, height: 44),
                                       const SizedBox(height: 10),
                                       Text(
                                         'Click to Upload',

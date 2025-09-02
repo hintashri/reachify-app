@@ -68,7 +68,7 @@ class InitHomeScreen extends StatelessWidget {
                       assetName: AssetConst.like,
                       index: 1,
                       onTap: () {
-                        // c.activeTab(0);
+                        c.activeTab(0);
                         if (user.userVerified) {
                           Get.toNamed(AppRoutes.wishlist);
                           // c.activeTab(1);
@@ -92,6 +92,7 @@ class InitHomeScreen extends StatelessWidget {
                       assetName: AssetConst.menu,
                       index: 3,
                       onTap: () async {
+                        c.activeTab(0);
                         await AppFunc.appPopUp(
                           title: 'Stay Updated on Every Platform',
                           desc: 'don’t miss any important update.',
@@ -105,6 +106,7 @@ class InitHomeScreen extends StatelessWidget {
                       assetName: AssetConst.user,
                       index: 4,
                       onTap: () {
+                        c.activeTab(0);
                         _scaffoldKey.currentState?.openDrawer();
                         // Get.toNamed(AppRoutes.createAcc);
                       },

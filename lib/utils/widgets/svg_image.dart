@@ -6,7 +6,7 @@ class SVGImage extends StatelessWidget {
   final BoxFit fit;
   final double? height;
   final double? width;
-  final ColorFilter? colorFilter;
+  final Color? color;
 
   const SVGImage(
     this.path, {
@@ -14,17 +14,19 @@ class SVGImage extends StatelessWidget {
     this.fit = BoxFit.contain,
     this.height,
     this.width,
-    this.colorFilter,
+    this.color,
   });
 
   @override
   Widget build(BuildContext context) {
     return SvgPicture.asset(
       path,
-      fit: fit,
-      width: width,
       height: height,
-      colorFilter: colorFilter,
+      width: width,
+      fit: BoxFit.contain,
+      colorFilter: color != null
+          ? ColorFilter.mode(color!, BlendMode.srcIn)
+          : null,
       // package: AppKey.core,
 
       // semanticsLabel: 'Acme Logo',

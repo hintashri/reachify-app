@@ -17,6 +17,7 @@ import 'package:reachify_app/utils/widgets/buttons/auth_elevated_button.dart';
 import 'package:reachify_app/utils/widgets/country_code.dart';
 import 'package:reachify_app/utils/widgets/custom_dropdown.dart';
 import 'package:reachify_app/utils/widgets/loading_view.dart';
+import 'package:reachify_app/utils/widgets/svg_image.dart';
 
 import '../../utils/widgets/auth_textfield.dart';
 
@@ -40,7 +41,7 @@ class MobileNoScreen extends StatelessWidget {
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
                   ZoomIn(
-                    child: Image.asset(
+                    child: SVGImage(
                       AssetConst.authImage,
                       height: context.height * 0.25,
                     ),

@@ -6,6 +6,7 @@ import 'package:get/get.dart';
 import 'package:reachify_app/configuration/user_config.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/utils/widgets/buttons/auth_elevated_button.dart';
+import 'package:reachify_app/utils/widgets/svg_image.dart';
 
 class AppFunc {
   static Future<dynamic> showSnackBar({required String message}) async {
@@ -72,7 +73,7 @@ class AppFunc {
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
                           if (assetName != null) ...[
-                            Image.asset(assetName, height: 150),
+                            SVGImage(assetName, height: 150),
                             const SizedBox(height: 30),
                           ],
                           Text(

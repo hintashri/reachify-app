@@ -11,6 +11,7 @@ import 'package:reachify_app/utils/const/url_const.dart';
 import 'package:reachify_app/utils/functions/url_luncher.dart';
 import 'package:reachify_app/utils/widgets/buttons/app_back_button.dart';
 import 'package:reachify_app/utils/widgets/cache_image.dart';
+import 'package:reachify_app/utils/widgets/svg_image.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
 class ProductDetailScreen extends StatelessWidget {
@@ -171,12 +172,11 @@ class SocialButton extends StatelessWidget {
       child: Container(
         height: 35,
         width: 35,
-        // padding: const EdgeInsets.all(8),
         decoration: BoxDecoration(
           borderRadius: BorderRadius.circular(10),
           border: Border.all(color: AppColors.iconColor, width: 1),
         ),
-        child: Image.asset(assets),
+        child: Center(child: SVGImage(assets, height: 20, width: 20)),
       ),
     );
   }
@@ -219,15 +219,19 @@ class CustomLikeButton extends StatelessWidget {
           border: Border.all(color: AppColors.iconColor, width: 1),
         ),
         child: LikeButton(
-          size: 18,
+          size: 20,
           likeCountPadding: EdgeInsets.zero,
           padding: EdgeInsets.zero,
           isLiked: isInWishlist,
           // adjust size
           likeBuilder: (bool isLiked) {
             return isLiked
-                ? const Icon(Icons.favorite, color: Colors.red, size: 20)
-                : Image.asset(AssetConst.like);
+                ? const Center(
+                    child: SVGImage(AssetConst.likeFill, height: 20, width: 20),
+                  )
+                : const Center(
+                    child: SVGImage(AssetConst.like, height: 20, width: 20),
+                  );
           },
           // optional animation circle & bubbles customization
           circleColor: const CircleColor(
@@ -260,7 +264,9 @@ class WhatsappButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Material(
-      color: Colors.transparent,
+      color: Colors.green,
+      borderRadius: BorderRadius.circular(10),
+      clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: () {
           urlLaunch(LaunchType.whatsapp, value: whatsapp);
@@ -270,11 +276,16 @@ class WhatsappButton extends StatelessWidget {
           padding: const EdgeInsets.all(8),
           decoration: BoxDecoration(
             borderRadius: BorderRadius.circular(10),
-            color: Colors.green,
+            // color: Colors.green,
           ),
           child: Row(
             children: [
-              Image.asset(AssetConst.whatsapp),
+              SVGImage(
+                AssetConst.whatsapp,
+                height: 20,
+                width: 20,
+                color: Colors.white,
+              ),
               const SizedBox(width: 3),
               Text(
                 'WhatsApp',

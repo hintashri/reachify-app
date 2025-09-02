@@ -11,6 +11,7 @@ import 'package:reachify_app/utils/const/key_const.dart';
 import 'package:reachify_app/utils/functions/app_func.dart';
 import 'package:reachify_app/utils/functions/register_dialog.dart';
 import 'package:reachify_app/utils/functions/url_luncher.dart';
+import 'package:reachify_app/utils/widgets/svg_image.dart';
 import 'package:reachify_app/utils/widgets/web_view_screen.dart';
 
 class CustomDrawer extends StatelessWidget {
@@ -219,7 +220,7 @@ class CustomDrawer extends StatelessWidget {
     VoidCallback? onTap,
   }) {
     return ListTile(
-      leading: Image.asset(assetIcon, height: 22, color: Colors.black87),
+      leading: SVGImage(assetIcon, height: 22, color: Colors.black87),
       title: Text(
         title,
         style: context.textTheme.bodyMedium?.copyWith(
@@ -313,7 +314,7 @@ class ShareIcon extends StatelessWidget {
           child: Column(
             mainAxisAlignment: MainAxisAlignment.start,
             children: [
-              Image.asset(image, height: 40, width: 40),
+              SVGImage(image, height: 40, width: 40),
               const SizedBox(height: 10),
               Text(
                 name,

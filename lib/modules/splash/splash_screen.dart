@@ -52,5 +52,4 @@ class SplashCtrl extends GetxController {
     await init.getCategories();
     await user.getCurrentUser();
   }
-
 }

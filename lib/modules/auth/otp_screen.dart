@@ -8,6 +8,7 @@ import 'package:reachify_app/modules/auth/mobile_no_ctrl.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
 import 'package:reachify_app/utils/widgets/buttons/auth_elevated_button.dart';
+import 'package:reachify_app/utils/widgets/svg_image.dart';
 
 class OtpScreen extends StatelessWidget {
   OtpScreen({super.key});
@@ -23,7 +24,7 @@ class OtpScreen extends StatelessWidget {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             ZoomIn(
-              child: Image.asset(
+              child: SVGImage(
                 AssetConst.authImage,
                 height: context.height * 0.25,
               ),
