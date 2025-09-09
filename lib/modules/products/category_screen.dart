@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/rendering.dart';
 import 'package:get/get.dart';
 import 'package:reachify_app/modules/products/category_ctrl.dart';
 import 'package:reachify_app/theme/app_colors.dart';
@@ -90,7 +91,7 @@ class _CategoryScreenState extends State<CategoryScreen>
                 unselectedLabelColor: Colors.black54,
                 labelPadding: const EdgeInsets.symmetric(horizontal: 15),
                 labelStyle: context.textTheme.labelSmall?.copyWith(
-                  fontSize: 12,
+                  fontSize: 14,
                 ),
                 padding: const EdgeInsets.symmetric(horizontal: 10),
                 isScrollable: true,
@@ -114,6 +115,13 @@ class _CategoryScreenState extends State<CategoryScreen>
                   itemCount: c.categoryList.length,
                   onPageChanged: (index) {
                     // This fires IMMEDIATELY when swipe starts
+                    Future.delayed(Duration(milliseconds: 100), () {
+                      Scrollable.ensureVisible(
+                        (context).findAncestorRenderObjectOfType<RenderSliver>()
+                            as BuildContext,
+                        duration: Duration(milliseconds: 300),
+                      );
+                    });
                     tabCtrl!.animateTo(index);
                     c.proLoading(true);
                     final int id = c.categoryList.elementAt(index).id;

@@ -1,7 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:flutter/services.dart';
 import 'package:get/get.dart';
-import 'package:reachify_app/configuration/notification_config.dart';
 import 'package:reachify_app/configuration/user_config.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/theme/app_colors.dart';
@@ -174,28 +172,28 @@ class CustomDrawer extends StatelessWidget {
             ),
           ),
 
-          FutureBuilder(
-            future: NotificationServices.getToken(),
-            builder: (context, snapshot) {
-              if (snapshot.hasData && snapshot.data != null) {
-                return Row(
-                  children: [
-                    Expanded(child: SelectableText('${snapshot.data}')),
-                    IconButton(
-                      onPressed: () async {
-                        await Clipboard.setData(
-                          ClipboardData(text: snapshot.data ?? ''),
-                        );
-                      },
-                      icon: const Icon(Icons.copy),
-                    ),
-                  ],
-                );
-              } else {
-                return const SizedBox();
-              }
-            },
-          ),
+          // FutureBuilder(
+          //   future: NotificationServices.getToken(),
+          //   builder: (context, snapshot) {
+          //     if (snapshot.hasData && snapshot.data != null) {
+          //       return Row(
+          //         children: [
+          //           Expanded(child: SelectableText('${snapshot.data}')),
+          //           IconButton(
+          //             onPressed: () async {
+          //               await Clipboard.setData(
+          //                 ClipboardData(text: snapshot.data ?? ''),
+          //               );
+          //             },
+          //             icon: const Icon(Icons.copy),
+          //           ),
+          //         ],
+          //       );
+          //     } else {
+          //       return const SizedBox();
+          //     }
+          //   },
+          // ),
 
           // Footer
           Padding(
@@ -245,7 +243,7 @@ class SocialMediaWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     return const Column(
       children: [
-        SizedBox(height: 25),
+        SizedBox(height: 11),
         Row(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [

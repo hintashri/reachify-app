@@ -192,10 +192,11 @@ class CreateAccScreen extends StatelessWidget {
                             // padding: EdgeInsets.symmetric(vertical: 32),
                           ),
                           child: Obx(() {
-                            if (user.appUser().image.isNotEmpty) {
+                            if (user.appUser().businessName.isNotEmpty &&
+                                user.appUser().image.isNotEmpty) {
                               return CacheImage(
                                 url:
-                                    '${UrlConst.baseUrl}/storage/app/public/product/${user.appUser().image}',
+                                    '${UrlConst.baseUrl}/storage/app/public/profile/${user.appUser().image}',
                               );
                             }
                             if (c.filePath().isNotEmpty) {
@@ -249,7 +250,10 @@ class CreateAccScreen extends StatelessWidget {
                                   ),
                                   child: Column(
                                     children: [
-                                      SVGImage(AssetConst.upload, height: 44),
+                                      const SVGImage(
+                                        AssetConst.upload,
+                                        height: 44,
+                                      ),
                                       const SizedBox(height: 10),
                                       Text(
                                         'Click to Upload',

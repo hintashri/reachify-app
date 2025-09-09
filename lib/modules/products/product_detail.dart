@@ -8,6 +8,7 @@ import 'package:reachify_app/utils/const/asset_const.dart';
 import 'package:reachify_app/utils/const/enums.dart';
 import 'package:reachify_app/utils/const/logger.dart';
 import 'package:reachify_app/utils/const/url_const.dart';
+import 'package:reachify_app/utils/functions/app_func.dart';
 import 'package:reachify_app/utils/functions/url_luncher.dart';
 import 'package:reachify_app/utils/widgets/buttons/app_back_button.dart';
 import 'package:reachify_app/utils/widgets/cache_image.dart';
@@ -110,7 +111,7 @@ class ProductDetailCard extends StatelessWidget {
             /// Owner name
             Text(
               // ownerName,
-              '${model.seller.fName}',
+              model.seller.fName,
 
               style: context.textTheme.labelSmall?.copyWith(
                 fontSize: 12,
@@ -166,7 +167,11 @@ class SocialButton extends StatelessWidget {
       onTap:
           onTap ??
           () {
-            if (type != null) urlLaunch(type!, value: data);
+            if (data.isNotEmpty) {
+              if (type != null) urlLaunch(type!, value: data);
+            } else {
+              AppFunc.showSnackBar(message: 'No Data found');
+            }
           },
       borderRadius: BorderRadius.circular(10),
       child: Container(
@@ -230,7 +235,12 @@ class CustomLikeButton extends StatelessWidget {
                     child: SVGImage(AssetConst.likeFill, height: 20, width: 20),
                   )
                 : const Center(
-                    child: SVGImage(AssetConst.like, height: 20, width: 20),
+                    child: SVGImage(
+                      AssetConst.like,
+                      height: 20,
+                      width: 20,
+                      color: Color.fromRGBO(109, 111, 126, 1.0),
+                    ),
                   );
           },
           // optional animation circle & bubbles customization
@@ -280,7 +290,7 @@ class WhatsappButton extends StatelessWidget {
           ),
           child: Row(
             children: [
-              SVGImage(
+              const SVGImage(
                 AssetConst.whatsapp,
                 height: 20,
                 width: 20,

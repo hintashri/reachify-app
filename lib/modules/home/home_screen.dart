@@ -4,6 +4,7 @@ import 'package:get/get.dart';
 import 'package:reachify_app/configuration/user_config.dart';
 import 'package:reachify_app/models/product_model.dart';
 import 'package:reachify_app/modules/home/home_ctrl.dart';
+import 'package:reachify_app/modules/home/init_home_ctrl.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/theme/app_theme.dart';
@@ -147,6 +148,8 @@ class HomeScreen extends StatelessWidget {
                                         title: model.name,
                                         onPress: () {
                                           if (user.userVerified) {
+                                            final a = Get.find<InitHomeCtrl>();
+                                            a.activeTab(0);
                                             Get.toNamed(
                                               AppRoutes.categoryScreen,
                                               arguments: model.id,
@@ -218,6 +221,8 @@ class CustomListView extends StatelessWidget {
           return InkWell(
             onTap: () {
               if (user.userVerified) {
+                final a = Get.find<InitHomeCtrl>();
+                a.activeTab(0);
                 Get.toNamed(
                   AppRoutes.productDetail,
                   arguments: {'index': index, 'list': products},
@@ -231,29 +236,12 @@ class CustomListView extends StatelessWidget {
                 borderRadius: BorderRadiusGeometry.circular(12),
               ),
               margin: EdgeInsets.zero,
-              elevation: 3,
+              elevation: 5,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: CacheImage(
                   url:
                       '${UrlConst.baseUrl}/storage/app/public/product/${model.images.first}',
-                  imageBuilder: (p0, p1) {
-                    return Container(
-                      width: 120,
-                      height: 120,
-                      decoration: BoxDecoration(
-                        boxShadow: [
-                          BoxShadow(
-                            color: Colors.black.withOpacity(0.3),
-                            spreadRadius: 2,
-                            blurRadius: 8,
-                            offset: const Offset(0, 4),
-                          ),
-                        ],
-                        image: DecorationImage(image: p1, fit: BoxFit.cover),
-                      ),
-                    );
-                  },
                   height: 120,
                   width: 120,
                 ),

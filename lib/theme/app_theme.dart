@@ -8,6 +8,7 @@ class AppTheme {
   static final darkTheme = ThemeData(
     iconTheme: const IconThemeData(color: Colors.black),
     primarySwatch: Colors.grey,
+    useMaterial3: false,
     brightness: Brightness.light,
     textSelectionTheme: TextSelectionThemeData(
       selectionHandleColor: AppColors.primary,

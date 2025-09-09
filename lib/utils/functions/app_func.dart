@@ -49,7 +49,8 @@ class AppFunc {
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.end,
                   children: [
-                    if (showClose) ...[
+                    if (child != null) ...[const SizedBox(height: 12)],
+                    if (showClose && child == null) ...[
                       Padding(
                         padding: const EdgeInsets.fromLTRB(0, 8, 8, 0),
                         child: IconButton(

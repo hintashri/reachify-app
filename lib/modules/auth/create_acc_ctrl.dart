@@ -105,9 +105,11 @@ class CreateAccCtrl extends GetxController {
 
   Future<void> useSkipToday() async {
     try {
+      logger.d('Use Skip Called');
       final s =
           await prefs.getValue(key: KeyConst.skipKey) ?? <String, dynamic>{};
-      final int counts = s[KeyConst.skipCount] ?? 0;
+
+      int counts = s[KeyConst.skipCount] ?? 0;
       final String d = s[KeyConst.skipDate] ?? '';
       final DateTime today = DateTime.now();
 
@@ -116,32 +118,41 @@ class CreateAccCtrl extends GetxController {
 
         if (!today.isSameDay(lastDate)) {
           // New day -> increment skip count
-          await prefs.setValue(
-            key: KeyConst.skipKey,
-            value: {
-              KeyConst.skipCount: counts + 1,
-              KeyConst.skipDate: today.toIso8601String(),
-            },
-          );
-        } else {
-          // Same day -> just update date to refresh timestamp
-          await prefs.setValue(
-            key: KeyConst.skipKey,
-            value: {
-              KeyConst.skipCount: counts,
-              KeyConst.skipDate: today.toIso8601String(),
-            },
-          );
+          counts++;
         }
+        // Same day -> just keep the count, refresh timestamp
       } else {
         // First ever skip
-        await prefs.setValue(
-          key: KeyConst.skipKey,
-          value: {
-            KeyConst.skipCount: 1,
-            KeyConst.skipDate: today.toIso8601String(),
-          },
-        );
+        counts = 1;
+      }
+
+      // ✅ Save updated values
+      await prefs.setValue(
+        key: KeyConst.skipKey,
+        value: {
+          KeyConst.skipCount: counts,
+          KeyConst.skipDate: today.toIso8601String(),
+        },
+      );
+
+      // ✅ Now perform action based on count
+      if (counts < 4) {
+        Get.offAllNamed(AppRoutes.home);
+      } else {
+        // Show dialog if user skipped too many times
+        // Get.dialog(
+        //   AlertDialog(
+        //     title: const Text("Too Many Skips"),
+        //     content: const Text("You have reached the skip limit for today."),
+        //     actions: [
+        //       TextButton(
+        //         onPressed: () => Get.back(),
+        //         child: const Text("OK"),
+        //       ),
+        //     ],
+        //   ),
+        //   barrierDismissible: false,
+        // );
       }
     } catch (e, t) {
       logger.e('$e\n$t');
@@ -167,6 +178,12 @@ class CreateAccCtrl extends GetxController {
       emailController.text = user.appUser().email;
       typeVal = init.bTypeList
           .firstWhereOrNull((e) => e.id == user.appUser().businessCategory)
+          ?.name;
+      cityVal.value = cityList
+          .firstWhereOrNull((e) => e.name == user.appUser().city)
+          ?.name;
+      cityVal.value = cityList
+          .firstWhereOrNull((e) => e.name == user.appUser().city)
           ?.name;
       cityVal.value = cityList
           .firstWhereOrNull((e) => e.name == user.appUser().city)
@@ -219,8 +236,10 @@ class CreateAccCtrl extends GetxController {
             'email': emailController.text.trim(),
             'country': country,
             'state': state,
-            'city': cityVal,
-            'business_category': typeVal ?? '',
+            'city': str1,
+            'business_category':
+                init.bTypeList.firstWhereOrNull((e) => e.name == typeVal)?.id ??
+                '',
             'business_name': bNameController.text.trim(),
             if (filePath.isNotEmpty)
               'image': await MultipartFile.fromFile(

@@ -528,6 +528,7 @@ class _OptimizedDropdownBottomSheetState<T>
                         title: Text(
                           item.toString(),
                           style: TextStyle(
+                            fontSize: 16,
                             color: widget.fontColor,
                             letterSpacing: 1.2,
                           ),

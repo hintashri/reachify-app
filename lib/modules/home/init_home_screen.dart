@@ -18,104 +18,113 @@ class InitHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return Scaffold(
-      key: _scaffoldKey,
-      // appBar: AppBar(
-      //   actions: [
-      //     IconButton(
-      //       onPressed: () {
-      //         AppFunc.deletePopUp(isLogout: true);
-      //       },
-      //       icon: const Icon(Icons.logout),
-      //     ),
-      //   ],
-      // ),
-      drawer: CustomDrawer(scaffoldKey: _scaffoldKey),
-      body: NotificationListener(
-        onNotification: c.handleScrollNotification,
-        child: Column(
-          children: [
-            Expanded(child: HomeScreen()),
-            SlideTransition(
-              position: c.offsetAnimation,
-              child: Container(
-                // height: 80,
-                padding: EdgeInsets.only(
-                  top: 10,
-                  bottom: 10 + context.mediaQueryViewPadding.bottom,
-                ),
-                decoration: BoxDecoration(
-                  color: Colors.white,
-                  boxShadow: [
-                    BoxShadow(
-                      color: Colors.black.withAlpha(10),
-                      blurRadius: 10,
-                      offset: const Offset(0, -2),
-                    ),
-                  ],
-                ),
-                child: Row(
-                  mainAxisAlignment: MainAxisAlignment.spaceAround,
-                  children: [
-                    NavBarButton(
-                      assetName: AssetConst.home,
-                      index: 0,
-                      onTap: () {
-                        c.activeTab(0);
-                      },
-                    ),
-                    NavBarButton(
-                      assetName: AssetConst.like,
-                      index: 1,
-                      onTap: () {
-                        c.activeTab(0);
-                        if (user.userVerified) {
-                          Get.toNamed(AppRoutes.wishlist);
-                          // c.activeTab(1);
-                        } else {
-                          registerDialogue();
-                        }
-                      },
-                    ),
-                    NavBarButton(
-                      assetName: AssetConst.search,
-                      index: 2,
-                      onTap: () {
-                        if (user.userVerified) {
-                          c.activeTab(2);
-                        } else {
-                          registerDialogue();
-                        }
-                      },
-                    ),
-                    NavBarButton(
-                      assetName: AssetConst.menu,
-                      index: 3,
-                      onTap: () async {
-                        c.activeTab(0);
-                        await AppFunc.appPopUp(
-                          title: 'Stay Updated on Every Platform',
-                          desc: 'don’t miss any important update.',
-                          buttonName: 'Close',
-                          child: const SocialMediaWidget(),
-                          buttonTap: Get.back,
-                        );
-                      },
-                    ),
-                    NavBarButton(
-                      assetName: AssetConst.user,
-                      index: 4,
-                      onTap: () {
-                        c.activeTab(0);
-                        _scaffoldKey.currentState?.openDrawer();
-                        // Get.toNamed(AppRoutes.createAcc);
-                      },
-                    ),
-                  ],
+    return PopScope(
+      canPop: c.activeTab() == 2 ? false : true,
+      onPopInvokedWithResult: (didPop, result) {
+        if (c.activeTab() == 2) {
+          c.activeTab(0);
+        }
+      },
+      child: Scaffold(
+        resizeToAvoidBottomInset: false,
+        key: _scaffoldKey,
+        // appBar: AppBar(
+        //   actions: [
+        //     IconButton(
+        //       onPressed: () {
+        //         AppFunc.deletePopUp(isLogout: true);
+        //       },
+        //       icon: const Icon(Icons.logout),
+        //     ),
+        //   ],
+        // ),
+        drawer: CustomDrawer(scaffoldKey: _scaffoldKey),
+        body: NotificationListener(
+          onNotification: c.handleScrollNotification,
+          child: Column(
+            children: [
+              Expanded(child: HomeScreen()),
+              SlideTransition(
+                position: c.offsetAnimation,
+                child: Container(
+                  // height: 80,
+                  padding: EdgeInsets.only(
+                    top: 8,
+                    bottom: 4 + context.mediaQueryViewPadding.bottom,
+                  ),
+                  decoration: BoxDecoration(
+                    color: Colors.white,
+                    boxShadow: [
+                      BoxShadow(
+                        color: Colors.black.withAlpha(10),
+                        blurRadius: 10,
+                        offset: const Offset(0, -2),
+                      ),
+                    ],
+                  ),
+                  child: Row(
+                    mainAxisAlignment: MainAxisAlignment.spaceAround,
+                    children: [
+                      NavBarButton(
+                        assetName: AssetConst.home,
+                        index: 0,
+                        onTap: () {
+                          c.activeTab(0);
+                        },
+                      ),
+                      NavBarButton(
+                        assetName: AssetConst.like,
+                        index: 1,
+                        onTap: () {
+                          c.activeTab(0);
+                          if (user.userVerified) {
+                            Get.toNamed(AppRoutes.wishlist);
+                            // c.activeTab(1);
+                          } else {
+                            registerDialogue();
+                          }
+                        },
+                      ),
+                      NavBarButton(
+                        assetName: AssetConst.search,
+                        index: 2,
+                        onTap: () {
+                          if (user.userVerified) {
+                            c.activeTab(2);
+                          } else {
+                            registerDialogue();
+                          }
+                        },
+                      ),
+                      NavBarButton(
+                        assetName: AssetConst.menu,
+                        index: 3,
+                        onTap: () async {
+                          c.activeTab(0);
+                          await AppFunc.appPopUp(
+                            title: 'Stay Updated on Every Platform',
+                            desc: 'don’t miss any important update.',
+                            buttonName: 'Close',
+                            child: const SocialMediaWidget(),
+                            buttonTap: Get.back,
+                          );
+                        },
+                      ),
+                      NavBarButton(
+                        assetName: AssetConst.user,
+                        index: 4,
+                        onTap: () {
+                          c.activeTab(0);
+                          _scaffoldKey.currentState?.openDrawer();
+                          // Get.toNamed(AppRoutes.createAcc);
+                        },
+                      ),
+                    ],
+                  ),
                 ),
               ),
-            ),
-          ],
+            ],
+          ),
         ),
       ),
     );

@@ -60,7 +60,11 @@ class HomeCtrl extends GetxController with GetSingleTickerProviderStateMixin {
     searchController.value = 0.0; // hidden initially
   }
 
-  void hideSearch() => searchController.reverse();
+  void hideSearch() =>
+      searchController.status == AnimationStatus.completed ||
+          searchController.status == AnimationStatus.forward
+      ? searchController.reverse()
+      : null;
 
   void showSearch() => searchController.forward();
 
