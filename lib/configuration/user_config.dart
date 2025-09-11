@@ -20,7 +20,7 @@ class UserConfig {
 
   int get userId => appUser().id;
 
-  bool get userVerified => appUser().isVerify == 1 ? true : false;
+  bool get userVerified => appUser().businessName.isNotEmpty;
 
   Rx<UserModel> appUser = UserModel().obs;
 

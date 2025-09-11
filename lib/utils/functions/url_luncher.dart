@@ -55,7 +55,7 @@ Future<void> urlLaunch(
       if (await canLaunchUrl(uri)) {
         bool launched = await launchUrl(
           uri,
-          mode: LaunchMode.inAppWebView,
+          mode: LaunchMode.externalApplication,
           webViewConfiguration: const WebViewConfiguration(
             enableJavaScript: true,
             enableDomStorage: true,

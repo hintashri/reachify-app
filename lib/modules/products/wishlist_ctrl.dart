@@ -51,6 +51,7 @@ class WishlistCtrl extends GetxController {
       if (net.successfulRes(response: response)) {
         logger.d(response.data);
         getProducts();
+
         return true;
       } else {
         logger.e(response);

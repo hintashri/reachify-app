@@ -130,7 +130,13 @@ class CustomDrawer extends StatelessWidget {
                     assetIcon: AssetConst.aboutUs,
                     title: 'About Us',
                     onTap: () {
-                      urlLaunch(LaunchType.website, value: KeyConst.aboutUs);
+                      Get.back();
+                      Get.to(
+                        () => const WebViewScreen(
+                          url: KeyConst.aboutUs,
+                          title: 'Contact Us',
+                        ),
+                      );
                     },
                   ),
                   drawerTile(

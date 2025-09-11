@@ -1,10 +1,12 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:get/get.dart';
 import 'package:reachify_app/configuration/user_config.dart';
 import 'package:reachify_app/modules/home/home_screen.dart';
 import 'package:reachify_app/modules/home/init_home_ctrl.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
+import 'package:reachify_app/utils/const/logger.dart';
 import 'package:reachify_app/utils/functions/app_func.dart';
 import 'package:reachify_app/utils/functions/register_dialog.dart';
 import 'package:reachify_app/utils/widgets/buttons/nav_bar_button.dart';
@@ -18,11 +20,20 @@ class InitHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    logger.d('Data :${c.activeTab()}');
     return PopScope(
-      canPop: c.activeTab() == 2 ? false : true,
+      canPop: false, // Always handle pop manually
       onPopInvokedWithResult: (didPop, result) {
-        if (c.activeTab() == 2) {
+        logger.d('Current tab: ${c.activeTab()}, didPop: $didPop');
+
+        if (c.activeTab() == 0) {
+          // On home page - allow app to close
+          SystemNavigator.pop();
+          return;
+        } else {
+          // On any other page (including search page at index 2) - go back to home
           c.activeTab(0);
+          return;
         }
       },
       child: Scaffold(

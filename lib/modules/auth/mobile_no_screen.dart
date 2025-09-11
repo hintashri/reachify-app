@@ -8,16 +8,15 @@ import 'package:reachify_app/models/country_model.dart';
 import 'package:reachify_app/modules/auth/mobile_no_ctrl.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
-import 'package:reachify_app/utils/const/enums.dart';
 import 'package:reachify_app/utils/const/key_const.dart';
 import 'package:reachify_app/utils/const/logger.dart';
-import 'package:reachify_app/utils/functions/url_luncher.dart';
 import 'package:reachify_app/utils/functions/validation_func.dart';
 import 'package:reachify_app/utils/widgets/buttons/auth_elevated_button.dart';
 import 'package:reachify_app/utils/widgets/country_code.dart';
 import 'package:reachify_app/utils/widgets/custom_dropdown.dart';
 import 'package:reachify_app/utils/widgets/loading_view.dart';
 import 'package:reachify_app/utils/widgets/svg_image.dart';
+import 'package:reachify_app/utils/widgets/web_view_screen.dart';
 
 import '../../utils/widgets/auth_textfield.dart';
 
@@ -151,9 +150,11 @@ class MobileNoScreen extends StatelessWidget {
                                 ),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    urlLaunch(
-                                      LaunchType.website,
-                                      value: KeyConst.termsCondition,
+                                    Get.to(
+                                      () => const WebViewScreen(
+                                        url: KeyConst.termsCondition,
+                                        title: 'Terms of Service',
+                                      ),
                                     );
                                   },
                               ),
@@ -173,9 +174,11 @@ class MobileNoScreen extends StatelessWidget {
                                 ),
                                 recognizer: TapGestureRecognizer()
                                   ..onTap = () {
-                                    urlLaunch(
-                                      LaunchType.website,
-                                      value: KeyConst.privacyPolicy,
+                                    Get.to(
+                                      () => const WebViewScreen(
+                                        url: KeyConst.privacyPolicy,
+                                        title: 'Privacy Policy',
+                                      ),
                                     );
                                   },
                               ),

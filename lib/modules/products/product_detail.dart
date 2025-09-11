@@ -1,7 +1,10 @@
+import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:like_button/like_button.dart';
+import 'package:photo_view/photo_view.dart';
 import 'package:reachify_app/models/product_model.dart';
+import 'package:reachify_app/modules/home/home_ctrl.dart';
 import 'package:reachify_app/modules/products/wishlist_ctrl.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
@@ -56,23 +59,14 @@ class ProductDetailScreen extends StatelessWidget {
 }
 
 class ProductDetailCard extends StatelessWidget {
-  // final String imageUrl;
-  // final String shopName;
-  // final String city;
-  // final String ownerName;
   final ProductModel model;
 
-  const ProductDetailCard({
-    super.key,
-    // required this.imageUrl,
-    // required this.shopName,
-    // required this.city,
-    // required this.ownerName,
-    required this.model,
-  });
+  const ProductDetailCard({super.key, required this.model});
 
   @override
   Widget build(BuildContext context) {
+    final imageUrl =
+        '${UrlConst.baseUrl}/storage/app/public/product/${model.images.first}';
     return Card(
       shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(10)),
       margin: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
@@ -88,15 +82,22 @@ class ProductDetailCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               margin: EdgeInsets.zero,
-              child: ClipRRect(
-                borderRadius: BorderRadius.circular(12),
-                child: CacheImage(
-                  url:
-                      '${UrlConst.baseUrl}/storage/app/public/product/${model.images.first}',
-
-                  // height: 180,
-                  // width: double.infinity,
-                  // fit: BoxFit.cover,
+              child: GestureDetector(
+                onTap: () {
+                  Get.to(
+                    () => ProductImageDetailPage(imageUrl: imageUrl),
+                    transition: Transition.noTransition,
+                  );
+                },
+                child: Hero(
+                  tag: imageUrl,
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(12),
+                    child: CacheImage(
+                      url:
+                          '${UrlConst.baseUrl}/storage/app/public/product/${model.images.first}',
+                    ),
+                  ),
                 ),
               ),
             ),
@@ -126,16 +127,25 @@ class ProductDetailCard extends StatelessWidget {
             Row(
               mainAxisAlignment: MainAxisAlignment.spaceBetween,
               children: [
-                WhatsappButton(whatsapp: model.seller.whatsappLink),
+                WhatsappButton(
+                  whatsapp: model.seller.whatsappLink,
+                  id: model.id,
+                ),
                 SocialButton(
                   type: LaunchType.call,
                   // asset: AssetConst.call,
                   data: model.seller.phoneNumber,
+                  id: model.id,
                 ),
-                SocialButton(data: model.seller.email, type: LaunchType.mail),
+                SocialButton(
+                  data: model.seller.email,
+                  type: LaunchType.mail,
+                  id: model.id,
+                ),
                 SocialButton(
                   data: model.seller.website,
                   type: LaunchType.website,
+                  id: model.id,
                 ),
                 CustomLikeButton(model: model),
               ],
@@ -147,18 +157,82 @@ class ProductDetailCard extends StatelessWidget {
   }
 }
 
+class ProductImageDetailPage extends StatefulWidget {
+  final String imageUrl;
+
+  const ProductImageDetailPage({super.key, required this.imageUrl});
+
+  @override
+  State<ProductImageDetailPage> createState() => _ProductImageDetailPageState();
+}
+
+class _ProductImageDetailPageState extends State<ProductImageDetailPage> {
+  final PhotoViewController _photoController = PhotoViewController();
+  bool _showPhotoView = true; // we will toggle this before popping
+
+  Future<void> _handleBack(BuildContext context) async {
+    if (_photoController.scale != 1.0) {
+      // ✅ Hide PhotoView first so Hero sees it in its original state
+      setState(() => _showPhotoView = false);
+
+      // wait one frame so widget tree updates before pop
+      await Future.delayed(const Duration(milliseconds: 16));
+    }
+
+    Get.back(); // now hero animates from contained state
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      backgroundColor: Colors.black,
+      extendBodyBehindAppBar: true,
+      appBar: AppBar(
+        backgroundColor: Colors.transparent,
+        elevation: 0,
+        leading: AppBackButton(onPressed: () => _handleBack(context)),
+      ),
+      body: Center(
+        child: Hero(
+          tag: widget.imageUrl,
+          child: _showPhotoView
+              ? PhotoView(
+                  controller: _photoController,
+                  imageProvider: CachedNetworkImageProvider(widget.imageUrl),
+                  backgroundDecoration: const BoxDecoration(
+                    color: Colors.transparent,
+                  ),
+                  minScale: PhotoViewComputedScale.contained,
+                  maxScale: PhotoViewComputedScale.covered * 3.0,
+                  initialScale: PhotoViewComputedScale.contained,
+                  enableRotation: false,
+                )
+              : Image(
+                  image: CachedNetworkImageProvider(widget.imageUrl),
+                  fit: BoxFit.contain,
+                ),
+        ),
+      ),
+    );
+  }
+}
+
 class SocialButton extends StatelessWidget {
   // final String asset;
   final String data;
   final LaunchType? type;
   final void Function()? onTap;
+  final int id;
 
-  const SocialButton({
+  final c = Get.find<HomeCtrl>();
+
+  SocialButton({
     super.key,
     // required this.asset,
     this.data = '',
     this.onTap,
     this.type,
+    required this.id,
   });
 
   @override
@@ -166,9 +240,15 @@ class SocialButton extends StatelessWidget {
     return InkWell(
       onTap:
           onTap ??
-          () {
+          () async {
             if (data.isNotEmpty) {
-              if (type != null) urlLaunch(type!, value: data);
+              if (type != null) {
+                await c.postInteraction(
+                  productId: id,
+                  interactionType: interactionType,
+                );
+                urlLaunch(type!, value: data);
+              }
             } else {
               AppFunc.showSnackBar(message: 'No Data found');
             }
@@ -198,6 +278,21 @@ class SocialButton extends StatelessWidget {
         return AssetConst.mail;
       case null:
         return AssetConst.like;
+    }
+  }
+
+  int get interactionType {
+    switch (type) {
+      case LaunchType.call:
+        return 2;
+      case LaunchType.whatsapp:
+        return 1;
+      case LaunchType.website:
+        return 4;
+      case LaunchType.mail:
+        return 3;
+      case null:
+        return 0;
     }
   }
 }
@@ -268,8 +363,11 @@ class CustomLikeButton extends StatelessWidget {
 
 class WhatsappButton extends StatelessWidget {
   final String whatsapp;
+  final int id;
 
-  const WhatsappButton({super.key, required this.whatsapp});
+  final c = Get.find<HomeCtrl>();
+
+  WhatsappButton({super.key, required this.whatsapp, required this.id});
 
   @override
   Widget build(BuildContext context) {
@@ -278,7 +376,8 @@ class WhatsappButton extends StatelessWidget {
       borderRadius: BorderRadius.circular(10),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
-        onTap: () {
+        onTap: () async {
+          await c.postInteraction(productId: id, interactionType: 1);
           urlLaunch(LaunchType.whatsapp, value: whatsapp);
         },
         borderRadius: BorderRadius.circular(10),

@@ -4,6 +4,7 @@ import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/cupertino.dart';
 import 'package:get/get.dart';
 import 'package:reachify_app/configuration/network_config.dart';
+import 'package:reachify_app/configuration/user_config.dart';
 import 'package:reachify_app/models/banner_model.dart';
 import 'package:reachify_app/models/category_model.dart';
 import 'package:reachify_app/models/product_model.dart';
@@ -106,7 +107,10 @@ class HomeCtrl extends GetxController with GetSingleTickerProviderStateMixin {
         final List<BannerModel> elements = data
             .map((json) => BannerModel.fromJson(json))
             .toList();
-        bannerList(elements);
+        final filterList = elements
+            .where((e) => e.id == user.appUser().selectedCategory)
+            .toList();
+        bannerList(filterList);
         // logger.d(bannerList.length);
       } else {
         logger.e(response);
@@ -168,6 +172,25 @@ class HomeCtrl extends GetxController with GetSingleTickerProviderStateMixin {
     } catch (e, t) {
       logger.e('$e\n$t');
       isSearching(false);
+    }
+  }
+
+  Future<void> postInteraction({
+    required int productId,
+    required int interactionType,
+  }) async {
+    try {
+      final response = await net.post(
+        url: UrlConst.postInteraction,
+        params: {'product_id': productId, 'interaction_type': interactionType},
+      );
+      if (net.successfulRes(response: response)) {
+        logger.d(response);
+      } else {
+        logger.e(response);
+      }
+    } catch (e, t) {
+      logger.e('$e\n$t');
     }
   }
 
