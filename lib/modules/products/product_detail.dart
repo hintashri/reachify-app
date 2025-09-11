@@ -130,6 +130,7 @@ class ProductDetailCard extends StatelessWidget {
                 WhatsappButton(
                   whatsapp: model.seller.whatsappLink,
                   id: model.id,
+                  message: model.seller.brand,
                 ),
                 SocialButton(
                   type: LaunchType.call,
@@ -363,11 +364,17 @@ class CustomLikeButton extends StatelessWidget {
 
 class WhatsappButton extends StatelessWidget {
   final String whatsapp;
+  final String message;
   final int id;
 
   final c = Get.find<HomeCtrl>();
 
-  WhatsappButton({super.key, required this.whatsapp, required this.id});
+  WhatsappButton({
+    super.key,
+    required this.whatsapp,
+    required this.id,
+    required this.message,
+  });
 
   @override
   Widget build(BuildContext context) {
@@ -378,7 +385,7 @@ class WhatsappButton extends StatelessWidget {
       child: InkWell(
         onTap: () async {
           await c.postInteraction(productId: id, interactionType: 1);
-          urlLaunch(LaunchType.whatsapp, value: whatsapp);
+          urlLaunch(LaunchType.whatsapp, value: whatsapp, message: message);
         },
         borderRadius: BorderRadius.circular(10),
         child: Container(
@@ -395,12 +402,13 @@ class WhatsappButton extends StatelessWidget {
                 width: 20,
                 color: Colors.white,
               ),
-              const SizedBox(width: 3),
+              // const SizedBox(width: 3),
               Text(
                 'WhatsApp',
                 style: context.textTheme.labelSmall?.copyWith(
                   fontWeight: FontWeight.w600,
                   color: Colors.white,
+                  letterSpacing: 0.8,
                 ),
               ),
             ],

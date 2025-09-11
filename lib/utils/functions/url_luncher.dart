@@ -17,15 +17,55 @@ Future<void> urlLaunch(
       uri = Uri(scheme: 'tel', path: value);
       if (!await launchUrl(uri, mode: LaunchMode.platformDefault)) {
         logger.d('Could not launch $uri');
-        // throw 'Could not launch $uri';
       }
       return;
 
     case LaunchType.whatsapp:
-      uri = Uri.parse(
-        "https://wa.me/$value?text=${Uri.encodeComponent(message ?? '')}",
-      );
-      break;
+      if (value.startsWith('https://api.whatsapp.com/send') ||
+          value.startsWith('https://wa.me/')) {
+        if (value.startsWith('https://api.whatsapp.com/send')) {
+          final Uri originalUri = Uri.parse(value);
+          final String? phone = originalUri.queryParameters['phone'];
+          final String? text = originalUri.queryParameters['text'];
+
+          if (phone != null) {
+            final String cleanPhone = phone.replaceAll('+', '');
+            uri = Uri.parse(
+              "https://wa.me/$cleanPhone${text != null ? '?text=$text' : ''}",
+            );
+          } else {
+            uri = Uri.parse(value);
+          }
+        } else {
+          uri = Uri.parse(value);
+        }
+      } else {
+        final String phoneNumber = value.replaceAll(RegExp(r'[^\d]'), '');
+        uri = Uri.parse(
+          "https://wa.me/$phoneNumber?text=${Uri.encodeComponent(message ?? '')}",
+        );
+      }
+
+      try {
+        if (await canLaunchUrl(uri)) {
+          final bool launched = await launchUrl(
+            uri,
+            mode: LaunchMode.externalApplication,
+          );
+
+          if (!launched) {
+            logger.d('Could not launch WhatsApp: $uri');
+            throw 'Could not launch WhatsApp';
+          }
+        } else {
+          logger.d('WhatsApp is not installed or cannot handle this URL: $uri');
+          throw 'WhatsApp is not available';
+        }
+      } catch (e) {
+        logger.d('Error launching WhatsApp: $e');
+        rethrow;
+      }
+      return;
 
     case LaunchType.website:
       final String formattedUrl = value.startsWith('http')
@@ -41,19 +81,17 @@ Future<void> urlLaunch(
         query:
             'subject=${Uri.encodeComponent(subject ?? '')}&body=${Uri.encodeComponent(body ?? '')}',
       );
-      // Use platformDefault for mailto
+
       if (!await launchUrl(uri, mode: LaunchMode.platformDefault)) {
         logger.d('Could not launch $uri');
       }
       return;
   }
 
-  // For website & whatsapp - try inAppWebView first, fallback to external
   try {
     if (type == LaunchType.website) {
-      // First check if the URL can be launched
       if (await canLaunchUrl(uri)) {
-        bool launched = await launchUrl(
+        final bool launched = await launchUrl(
           uri,
           mode: LaunchMode.externalApplication,
           webViewConfiguration: const WebViewConfiguration(
@@ -64,21 +102,15 @@ Future<void> urlLaunch(
 
         if (!launched) {
           logger.d('InAppWebView failed, trying external application');
-          // Fallback to external application
           await launchUrl(uri, mode: LaunchMode.externalApplication);
         }
       } else {
         logger.d('Cannot launch URL: $uri');
         throw 'Cannot launch URL: $uri';
       }
-    } else {
-      // For WhatsApp, use external application
-      if (!await launchUrl(uri, mode: LaunchMode.externalApplication)) {
-        logger.d('Could not launch $uri');
-        throw 'Could not launch $uri';
-      }
     }
   } catch (e) {
     logger.d('Error launching URL: $e');
+    rethrow;
   }
 }

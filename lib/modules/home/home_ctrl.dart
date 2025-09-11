@@ -108,7 +108,7 @@ class HomeCtrl extends GetxController with GetSingleTickerProviderStateMixin {
             .map((json) => BannerModel.fromJson(json))
             .toList();
         final filterList = elements
-            .where((e) => e.id == user.appUser().selectedCategory)
+            .where((e) => e.catId == user.appUser().selectedCategory)
             .toList();
         bannerList(filterList);
         // logger.d(bannerList.length);
