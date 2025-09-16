@@ -93,14 +93,14 @@ class HomeCtrl extends GetxController with GetSingleTickerProviderStateMixin {
   RxList<BannerModel> bannerList = <BannerModel>[].obs;
   RxList<CategoryModel> homeList = <CategoryModel>[].obs;
   RxInt activeIndex = 0.obs;
-  RxBool gettingBanner = true.obs;
+  // RxBool gettingBanner = true.obs;
   RxBool otherData = true.obs;
   RxBool isSearching = false.obs;
   RxBool isLoading = false.obs;
 
   Future<void> getBanners() async {
     try {
-      gettingBanner(true);
+      // gettingBanner(true);
       final response = await net.get(url: UrlConst.getBanners, params: {});
       if (net.successfulRes(response: response)) {
         final List<dynamic> data = response.data;
@@ -115,10 +115,10 @@ class HomeCtrl extends GetxController with GetSingleTickerProviderStateMixin {
       } else {
         logger.e(response);
       }
-      gettingBanner(false);
+      // gettingBanner(false);
     } catch (e, t) {
       logger.e('$e\n$t');
-      gettingBanner(false);
+      // gettingBanner(false);
     }
   }
 

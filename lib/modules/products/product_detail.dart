@@ -9,7 +9,6 @@ import 'package:reachify_app/modules/products/wishlist_ctrl.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
 import 'package:reachify_app/utils/const/enums.dart';
-import 'package:reachify_app/utils/const/logger.dart';
 import 'package:reachify_app/utils/const/url_const.dart';
 import 'package:reachify_app/utils/functions/app_func.dart';
 import 'package:reachify_app/utils/functions/url_luncher.dart';
@@ -18,42 +17,128 @@ import 'package:reachify_app/utils/widgets/cache_image.dart';
 import 'package:reachify_app/utils/widgets/svg_image.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
-class ProductDetailScreen extends StatelessWidget {
-  ProductDetailScreen({super.key});
+class ProductDetailScreen extends StatefulWidget {
+  const ProductDetailScreen({super.key});
 
+  @override
+  State<ProductDetailScreen> createState() => _ProductDetailScreenState();
+}
+
+class _ProductDetailScreenState extends State<ProductDetailScreen> {
   final int index = Get.arguments['index'];
   final List<ProductModel> list = Get.arguments['list'];
 
+  final ItemScrollController itemScrollController = ItemScrollController();
+  final ItemPositionsListener itemPositionsListener =
+      ItemPositionsListener.create();
+
+  bool _isAppBarVisible = true;
+  double _lastScrollPosition = 0.0;
+  bool _isInitialScroll = true;
+
+  @override
+  void initState() {
+    super.initState();
+
+    // Listen to scroll position changes
+    itemPositionsListener.itemPositions.addListener(_onScrollChanged);
+  }
+
+  void _onScrollChanged() {
+    if (itemPositionsListener.itemPositions.value.isNotEmpty) {
+      // Skip initial scroll to target index
+      if (_isInitialScroll) {
+        _isInitialScroll = false;
+        return;
+      }
+
+      // Get the first visible item's position
+      final positions = itemPositionsListener.itemPositions.value.toList();
+      if (positions.isEmpty) return;
+
+      // Calculate a more accurate scroll position using multiple visible items
+      double currentScrollPosition = 0;
+      for (final position in positions) {
+        currentScrollPosition += position.index - position.itemLeadingEdge;
+      }
+      currentScrollPosition = currentScrollPosition / positions.length;
+
+      // Add threshold to avoid too sensitive changes
+      const double threshold = 0.1;
+
+      // Determine scroll direction with threshold
+      if (currentScrollPosition > _lastScrollPosition + threshold) {
+        // Scrolling down - hide app bar
+        if (_isAppBarVisible) {
+          setState(() {
+            _isAppBarVisible = false;
+          });
+        }
+      } else if (currentScrollPosition < _lastScrollPosition - threshold) {
+        // Scrolling up - show app bar
+        if (!_isAppBarVisible) {
+          setState(() {
+            _isAppBarVisible = true;
+          });
+        }
+      }
+
+      _lastScrollPosition = currentScrollPosition;
+    }
+  }
+
+  @override
+  void dispose() {
+    itemPositionsListener.itemPositions.removeListener(_onScrollChanged);
+    super.dispose();
+  }
+
   @override
   Widget build(BuildContext context) {
-    logger.d(list[index].toJson());
     return Scaffold(
-      appBar: AppBar(leading: const AppBackButton()),
-      body: ScrollablePositionedList.builder(
-        initialScrollIndex: index,
-        itemCount: list.length,
-        itemBuilder: (context, index) {
-          return ProductDetailCard(model: list[index]);
-        },
+      body: SafeArea(
+        child: Stack(
+          children: [
+            ScrollablePositionedList.builder(
+              initialScrollIndex: index,
+              itemCount: list.length,
+              itemScrollController: itemScrollController,
+              itemPositionsListener: itemPositionsListener,
+              padding: EdgeInsets.only(
+                top: _isAppBarVisible ? kToolbarHeight : 0,
+              ),
+              itemBuilder: (context, index) {
+                return ProductDetailCard(model: list[index]);
+              },
+            ),
+            // Floating App Bar
+            AnimatedPositioned(
+              duration: const Duration(milliseconds: 200),
+              curve: Curves.easeInOut,
+              top: _isAppBarVisible ? 0 : -kToolbarHeight,
+              left: 0,
+              right: 0,
+              child: Container(
+                height: kToolbarHeight,
+                decoration: BoxDecoration(
+                  color: Theme.of(context).scaffoldBackgroundColor,
+                  border: Border(
+                    bottom: BorderSide(
+                      color: Colors.grey.withOpacity(0.2),
+                      width: 0.5,
+                    ),
+                  ),
+                ),
+                child: AppBar(
+                  leading: const AppBackButton(),
+                  backgroundColor: Colors.transparent,
+                  elevation: 0,
+                ),
+              ),
+            ),
+          ],
+        ),
       ),
-      // ListView(
-      //   children: const [
-      //     ProductDetailCard(
-      //       imageUrl:
-      //           'https://images.pexels.com/photos/326055/pexels-photo-326055.jpeg?_gl=1*3h4c5x*_ga*Mjg5MjczNDk4LjE3NTYzNTA2ODA.*_ga_8JE65Q40S6*czE3NTYzNTA2NzkkbzEkZzEkdDE3NTYzNTA3MTYkajIzJGwwJGgw',
-      //       shopName: 'Balaji Hardware',
-      //       city: 'Rajkot',
-      //       ownerName: 'Mr. Chiragbhai Patel',
-      //     ),
-      //     ProductDetailCard(
-      //       imageUrl:
-      //           'https://images.pexels.com/photos/326055/pexels-photo-326055.jpeg?_gl=1*3h4c5x*_ga*Mjg5MjczNDk4LjE3NTYzNTA2ODA.*_ga_8JE65Q40S6*czE3NTYzNTA2NzkkbzEkZzEkdDE3NTYzNTA3MTYkajIzJGwwJGgw',
-      //       shopName: 'Rajan Polyplast',
-      //       city: 'Rajkot',
-      //       ownerName: 'Mr. Chiragbhai Patel',
-      //     ),
-      //   ],
-      // ),
     );
   }
 }
@@ -94,6 +179,7 @@ class ProductDetailCard extends StatelessWidget {
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(12),
                     child: CacheImage(
+                      aspectRatio: 1,
                       url:
                           '${UrlConst.baseUrl}/storage/app/public/product/${model.images.first}',
                     ),

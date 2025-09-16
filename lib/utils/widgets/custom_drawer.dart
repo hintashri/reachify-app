@@ -134,7 +134,7 @@ class CustomDrawer extends StatelessWidget {
                       Get.to(
                         () => const WebViewScreen(
                           url: KeyConst.aboutUs,
-                          title: 'Contact Us',
+                          title: 'About Us',
                         ),
                       );
                     },

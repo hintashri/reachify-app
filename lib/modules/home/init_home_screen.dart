@@ -20,7 +20,7 @@ class InitHomeScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    logger.d('Data :${c.activeTab()}');
+    // logger.d('Data :${c.activeTab()}');
     return PopScope(
       canPop: false, // Always handle pop manually
       onPopInvokedWithResult: (didPop, result) {

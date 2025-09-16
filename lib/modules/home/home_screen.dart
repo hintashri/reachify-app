@@ -8,8 +8,10 @@ import 'package:reachify_app/modules/home/init_home_ctrl.dart';
 import 'package:reachify_app/routes/app_routes.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/theme/app_theme.dart';
+import 'package:reachify_app/utils/const/enums.dart';
 import 'package:reachify_app/utils/const/url_const.dart';
 import 'package:reachify_app/utils/functions/register_dialog.dart';
+import 'package:reachify_app/utils/functions/url_luncher.dart';
 import 'package:reachify_app/utils/widgets/auth_textfield.dart';
 import 'package:reachify_app/utils/widgets/cache_image.dart';
 import 'package:reachify_app/utils/widgets/empty_view.dart';
@@ -24,7 +26,7 @@ class HomeScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() {
-      if (c.gettingBanner()) {
+      if (c.isLoading.isTrue) {
         return const LoaderView();
       } else {
         return SingleChildScrollView(
@@ -84,11 +86,23 @@ class HomeScreen extends StatelessWidget {
                                 carouselController: c.controller,
                                 itemCount: c.bannerList.length,
                                 itemBuilder: (context, index, realIndex) {
-                                  return CacheImage(
-                                    url:
-                                        '${UrlConst.baseUrl}/storage/app/public/banner/${c.bannerList[index].photo}',
-                                    fit: BoxFit.cover,
-                                    width: double.infinity,
+                                  return InkWell(
+                                    onTap: () {
+                                      if (user.userVerified) {
+                                        urlLaunch(
+                                          LaunchType.whatsapp,
+                                          value: c.bannerList[index].url,
+                                        );
+                                      } else {
+                                        registerDialogue();
+                                      }
+                                    },
+                                    child: CacheImage(
+                                      url:
+                                          '${UrlConst.baseUrl}/storage/app/public/banner/${c.bannerList[index].photo}',
+                                      fit: BoxFit.cover,
+                                      width: double.infinity,
+                                    ),
                                   );
                                 },
                                 options: CarouselOptions(
@@ -159,11 +173,7 @@ class HomeScreen extends StatelessWidget {
                                           }
                                         },
                                       ),
-                                      CustomListView(
-                                        products: model.products.length <= 10
-                                            ? model.products
-                                            : model.products.take(10).toList(),
-                                      ),
+                                      CustomListView(products: model.products),
                                     ],
                                   );
                                 } else {
@@ -206,18 +216,21 @@ class CustomListView extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final showList = products.length <= 10
+        ? products
+        : products.take(10).toList();
     return SizedBox(
       height: 120,
       child: ListView.separated(
         scrollDirection: Axis.horizontal,
-        itemCount: products.length,
+        itemCount: showList.length,
         clipBehavior: Clip.none,
         padding: const EdgeInsets.symmetric(horizontal: 8),
         separatorBuilder: (context, index) {
           return const SizedBox(width: 12);
         },
         itemBuilder: (context, index) {
-          final model = products[index];
+          final model = showList[index];
           return InkWell(
             onTap: () {
               if (user.userVerified) {

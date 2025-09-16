@@ -7,6 +7,7 @@ class CacheImage extends StatelessWidget {
   final String url;
   final double? height;
   final double? width;
+  final double? aspectRatio;
   final BoxFit? fit;
   final Widget Function(BuildContext, ImageProvider<Object>)? imageBuilder;
 
@@ -17,6 +18,7 @@ class CacheImage extends StatelessWidget {
     this.width,
     this.fit,
     this.imageBuilder,
+    this.aspectRatio,
   });
 
   @override
@@ -29,10 +31,18 @@ class CacheImage extends StatelessWidget {
         width: width,
         height: height,
         imageBuilder: imageBuilder,
-        placeholder: (context, url) => ShimmerWidget(
-          width: width ?? context.width,
-          height: height ?? context.height,
-        ),
+        placeholder: (context, url) => aspectRatio != null
+            ? AspectRatio(
+                aspectRatio: 1,
+                child: ShimmerWidget(
+                  width: width ?? context.width,
+                  height: height ?? context.height,
+                ),
+              )
+            : ShimmerWidget(
+                width: width ?? context.width,
+                height: height ?? context.height,
+              ),
       ),
     );
   }
