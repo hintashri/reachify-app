@@ -4,20 +4,22 @@ import 'package:flutter/gestures.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:pin_code_fields/pin_code_fields.dart';
-import 'package:reachify_app/modules/auth/mobile_no_ctrl.dart';
 import 'package:reachify_app/theme/app_colors.dart';
 import 'package:reachify_app/utils/const/asset_const.dart';
 import 'package:reachify_app/utils/widgets/buttons/auth_elevated_button.dart';
 import 'package:reachify_app/utils/widgets/svg_image.dart';
 
+import 'otp_screen_ctrl.dart';
+
 class OtpScreen extends StatelessWidget {
   OtpScreen({super.key});
 
-  final c = Get.find<MobileNoCtrl>();
+  final c = Get.put(OtpScreenCtrl());
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: SingleChildScrollView(
         padding: const EdgeInsets.fromLTRB(20, 60, 20, 20),
         child: Column(
@@ -52,8 +54,7 @@ class OtpScreen extends StatelessWidget {
                       text: 'Enter the code from the sms we sent to\n',
                     ),
                     TextSpan(
-                      text:
-                          '+${c.countryCode} ${c.phoneController.text.trim()}',
+                      text: '+${c.countryCode} ${c.phoneNumber}',
                       style: context.textTheme.labelMedium?.copyWith(
                         fontWeight: FontWeight.w600,
                       ),
@@ -83,8 +84,8 @@ class OtpScreen extends StatelessWidget {
                     pinTheme: PinTheme(
                       shape: PinCodeFieldShape.box,
                       borderRadius: BorderRadius.circular(10),
-                      fieldHeight: 50,
-                      fieldWidth: 50,
+                      fieldHeight: 54,
+                      fieldWidth: 54,
                       activeColor: AppColors.primary,
                       disabledColor: Theme.of(context).disabledColor,
                       errorBorderColor: Theme.of(context).colorScheme.error,
@@ -112,58 +113,95 @@ class OtpScreen extends StatelessWidget {
                         color: AppColors.textLight,
                       ),
                       children: [
-                        const TextSpan(text: 'Didn’t you receive the OTP?'),
+                        const TextSpan(text: 'Didn\'t you receive the OTP?'),
                         WidgetSpan(
                           alignment: PlaceholderAlignment.middle,
-                          child: InkWell(
-                            borderRadius: BorderRadius.circular(5),
-                            onTap: c.resendingOtp()
-                                ? null
-                                : () async {
-                                    await c.resendOtp();
-                                  },
-                            child: Padding(
-                              padding: const EdgeInsets.symmetric(
-                                vertical: 5,
-                                horizontal: 8,
+                          child: Obx(() {
+                            return InkWell(
+                              borderRadius: BorderRadius.circular(5),
+                              onTap: (c.resendingOtp() || !c.canResendOtp())
+                                  ? null
+                                  : () async {
+                                      await c.resendOtp();
+                                    },
+                              child: Padding(
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 5,
+                                  horizontal: 8,
+                                ),
+                                child: Obx(() {
+                                  if (c.resendingOtp()) {
+                                    return const CupertinoActivityIndicator();
+                                  } else if (!c.canResendOtp() &&
+                                      c.resendCountdown() > 0) {
+                                    return Text(
+                                      'Resend OTP in ${c.resendTimerText}',
+                                      style: context.textTheme.labelSmall
+                                          ?.copyWith(
+                                            color: AppColors.textLight,
+                                            fontWeight: FontWeight.w500,
+                                          ),
+                                    );
+                                  } else {
+                                    return Text(
+                                      'Resend OTP',
+                                      style: context.textTheme.labelSmall
+                                          ?.copyWith(
+                                            color: c.canResendOtp()
+                                                ? AppColors.lightPrimary
+                                                : AppColors.textLight,
+                                            fontWeight: FontWeight.w500,
+                                            decoration: c.canResendOtp()
+                                                ? TextDecoration.underline
+                                                : TextDecoration.none,
+                                            decorationColor:
+                                                AppColors.lightPrimary,
+                                          ),
+                                    );
+                                  }
+                                }),
                               ),
-                              child: Obx(() {
-                                if (c.resendingOtp()) {
-                                  return const CupertinoActivityIndicator();
-                                } else {
-                                  return Text(
-                                    'Resend OTP',
-                                    style: context.textTheme.labelSmall
-                                        ?.copyWith(
-                                          color: AppColors.lightPrimary,
-                                          fontWeight: FontWeight.w500,
-                                          decoration: TextDecoration.underline,
-                                          decorationColor:
-                                              AppColors.lightPrimary,
-                                        ),
-                                  );
-                                }
-                              }),
-                            ),
-                          ),
+                            );
+                          }),
                         ),
                       ],
                     ),
                   ),
-                  SizedBox(height: context.height * 0.15),
-                  Obx(() {
-                    return AuthElevatedButton(
-                      isLoading: c.sendingOTP(),
-                      title: 'Submit OTP',
-                      onPressed: () async {
-                        c.sendOtp();
-                      },
-                    );
-                  }),
+                  // SizedBox(height: context.height * 0.15),
+                  // Obx(() {
+                  //   return AuthElevatedButton(
+                  //     isLoading: c.sendingOTP(),
+                  //     title: 'Submit OTP',
+                  //     onPressed: () async {
+                  //       c.sendOtp();
+                  //     },
+                  //   );
+                  // }),
                 ],
               ),
             ),
           ],
+        ),
+      ),
+
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Obx(() {
+                return AuthElevatedButton(
+                  size: Size(context.width, 30),
+                  isLoading: c.sendingOTP.value,
+                  title: 'Submit OTP',
+                  onPressed: () async {
+                    c.sendOtp();
+                  },
+                );
+              }),
+            ],
+          ),
         ),
       ),
     );

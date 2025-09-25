@@ -172,11 +172,13 @@ class AppFunc {
                       Expanded(
                         child: InkWell(
                           borderRadius: BorderRadius.circular(5),
-                          onTap: isLogout
-                              ? () {
-                                  user.logoutUser();
-                                }
-                              : onTap,
+                          onTap: () {
+                            if (isLogout) {
+                              user.logoutUser();
+                            } else {
+                              user.deleteUser();
+                            }
+                          },
                           child: Text(
                             isLogout ? 'Logout' : 'Delete',
                             style: context.textTheme.labelLarge?.copyWith(

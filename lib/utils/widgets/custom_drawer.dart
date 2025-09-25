@@ -93,6 +93,7 @@ class CustomDrawer extends StatelessWidget {
                     assetIcon: AssetConst.profile,
                     title: 'Edit Profile',
                     onTap: () {
+                      Get.back();
                       Get.toNamed(AppRoutes.createAcc);
                     },
                   ),
@@ -120,6 +121,8 @@ class CustomDrawer extends StatelessWidget {
                     title: 'Notification Settings',
                     onTap: () {
                       if (user.userVerified) {
+                        Get.back();
+                        Get.toNamed(AppRoutes.notification);
                       } else {
                         registerDialogue();
                       }
@@ -158,11 +161,7 @@ class CustomDrawer extends StatelessWidget {
                     assetIcon: AssetConst.dltAcc,
                     title: 'Delete Account',
                     onTap: () async {
-                      await AppFunc.deletePopUp(
-                        onTap: () {
-                          Get.back();
-                        },
-                      );
+                      await AppFunc.deletePopUp(onTap: () {});
                     },
                   ),
                   drawerTile(

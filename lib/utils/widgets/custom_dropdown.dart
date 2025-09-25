@@ -92,7 +92,10 @@ class CustomDropDownButton<T> extends StatelessWidget {
           borderRadius: BorderRadius.circular(radius),
           borderSide: const BorderSide(color: AppColors.borderColor),
         ),
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 14,
+        ),
       ),
     );
   }
@@ -176,7 +179,7 @@ class _OptimizedDropDownMenuState<T> extends State<OptimizedDropDownMenu<T>> {
                 ),
                 padding: const EdgeInsets.symmetric(
                   horizontal: 14,
-                  vertical: 12,
+                  vertical: 14,
                 ),
                 child: Row(
                   children: [

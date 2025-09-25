@@ -9,4 +9,5 @@ class AppRoutes {
   static const String searchList = '/search-list';
   static const String productDetail = '/product-detail';
   static const String promoteBrand = '/promote-brand';
+  static const String notification = '/notification-pref';
 }

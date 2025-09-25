@@ -30,6 +30,7 @@ class CreateAccScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       appBar: AppBar(
         automaticallyImplyLeading: false,
         leading: c.fromAuth() ? null : const AppBackButton(),
@@ -188,39 +189,77 @@ class CreateAccScreen extends StatelessWidget {
                             dashPattern: [6, 6],
                             strokeWidth: 1,
                             radius: Radius.circular(6),
+
                             color: AppColors.textLight,
                             // padding: EdgeInsets.symmetric(vertical: 32),
                           ),
-                          child: Obx(() {
-                            if (user.appUser().businessName.isNotEmpty &&
-                                user.appUser().image.isNotEmpty) {
-                              return CacheImage(
-                                url:
-                                    '${UrlConst.baseUrl}/storage/app/public/profile/${user.appUser().image}',
-                              );
-                            }
-                            if (c.filePath().isNotEmpty) {
-                              final ext = c.filePath().toLowerCase();
-                              final isPdf = ext.endsWith('.pdf');
-                              if (isPdf) {
+                          child: Center(
+                            child: Obx(() {
+                              if (user.appUser().businessName.isNotEmpty &&
+                                  user.appUser().image.isNotEmpty) {
+                                return CacheImage(
+                                  url:
+                                      '${UrlConst.baseUrl}/storage/app/public/profile/${user.appUser().image}',
+                                );
+                              }
+                              if (c.filePath().isNotEmpty) {
+                                final ext = c.filePath().toLowerCase();
+                                final isPdf = ext.endsWith('.pdf');
+                                if (isPdf) {
+                                  return Center(
+                                    child: Padding(
+                                      padding: const EdgeInsets.symmetric(
+                                        vertical: 30,
+                                      ),
+                                      child: Column(
+                                        children: [
+                                          Text(
+                                            '📂',
+                                            style:
+                                                context.textTheme.headlineLarge,
+                                          ),
+                                          const SizedBox(height: 10),
+                                          Text(
+                                            c
+                                                .filePath()
+                                                .split('/file_picker/')
+                                                .last,
+                                            style: context.textTheme.labelSmall
+                                                ?.copyWith(
+                                                  color: AppColors.lightPrimary,
+                                                  fontWeight: FontWeight.w500,
+                                                ),
+                                          ),
+                                        ],
+                                      ),
+                                    ),
+                                  );
+                                } else {
+                                  return ClipRRect(
+                                    borderRadius: BorderRadius.circular(6),
+                                    clipBehavior: Clip.antiAlias,
+                                    child: Image.file(
+                                      File(c.filePath()),
+                                      fit: BoxFit.cover,
+                                      width: context.width,
+                                    ),
+                                  );
+                                }
+                              } else {
                                 return Center(
                                   child: Padding(
                                     padding: const EdgeInsets.symmetric(
-                                      vertical: 30,
+                                      vertical: 32,
                                     ),
                                     child: Column(
                                       children: [
-                                        Text(
-                                          '📂',
-                                          style:
-                                              context.textTheme.headlineLarge,
+                                        const SVGImage(
+                                          AssetConst.upload,
+                                          height: 44,
                                         ),
                                         const SizedBox(height: 10),
                                         Text(
-                                          c
-                                              .filePath()
-                                              .split('/file_picker/')
-                                              .last,
+                                          'Click to Upload',
                                           style: context.textTheme.labelSmall
                                               ?.copyWith(
                                                 color: AppColors.lightPrimary,
@@ -231,61 +270,26 @@ class CreateAccScreen extends StatelessWidget {
                                     ),
                                   ),
                                 );
-                              } else {
-                                return ClipRRect(
-                                  borderRadius: BorderRadius.circular(6),
-                                  clipBehavior: Clip.antiAlias,
-                                  child: Image.file(
-                                    File(c.filePath()),
-                                    fit: BoxFit.cover,
-                                    width: context.width,
-                                  ),
-                                );
                               }
-                            } else {
-                              return Center(
-                                child: Padding(
-                                  padding: const EdgeInsets.symmetric(
-                                    vertical: 32,
-                                  ),
-                                  child: Column(
-                                    children: [
-                                      const SVGImage(
-                                        AssetConst.upload,
-                                        height: 44,
-                                      ),
-                                      const SizedBox(height: 10),
-                                      Text(
-                                        'Click to Upload',
-                                        style: context.textTheme.labelSmall
-                                            ?.copyWith(
-                                              color: AppColors.lightPrimary,
-                                              fontWeight: FontWeight.w500,
-                                            ),
-                                      ),
-                                    ],
-                                  ),
-                                ),
-                              );
-                            }
-                          }),
+                            }),
+                          ),
                         ),
                       ),
                     ),
-                    const SizedBox(height: 40),
-                    Obx(() {
-                      return AuthElevatedButton(
-                        isLoading: c.isButtonLoading(),
-                        title: user.appUser().businessName.isNotEmpty
-                            ? 'Update'
-                            : 'Sign Up',
-                        onPressed: () async {
-                          if (c.formKey.currentState?.validate() ?? false) {
-                            c.signup();
-                          }
-                        },
-                      );
-                    }),
+                    const SizedBox(height: 20),
+                    // Obx(() {
+                    //   return AuthElevatedButton(
+                    //     isLoading: c.isButtonLoading(),
+                    //     title: user.appUser().businessName.isNotEmpty
+                    //         ? 'Update'
+                    //         : 'Sign Up',
+                    //     onPressed: () async {
+                    //       if (c.formKey.currentState?.validate() ?? false) {
+                    //         c.signup();
+                    //       }
+                    //     },
+                    //   );
+                    // }),
                   ],
                 ),
               ),
@@ -293,6 +297,30 @@ class CreateAccScreen extends StatelessWidget {
           );
         }
       }),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              Obx(() {
+                return AuthElevatedButton(
+                  size: Size(context.width, 30),
+                  isLoading: c.isButtonLoading(),
+                  title: user.appUser().businessName.isNotEmpty
+                      ? 'Update'
+                      : 'Sign Up',
+                  onPressed: () async {
+                    if (c.formKey.currentState?.validate() ?? false) {
+                      c.signup();
+                    }
+                  },
+                );
+              }),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

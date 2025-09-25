@@ -10,15 +10,17 @@ class AuthElevatedButton extends StatelessWidget {
   final Color? color;
   final VoidCallback? onPressed;
   final double verticalPadding;
+  final Size? size;
 
   const AuthElevatedButton({
     super.key,
     this.onPressed,
     this.title,
     this.color,
+    this.size,
     this.isLoading = false,
     this.radius = 10,
-    this.verticalPadding = 12,
+    this.verticalPadding = 14,
   });
 
   @override
@@ -35,7 +37,8 @@ class AuthElevatedButton extends StatelessWidget {
         shape: RoundedRectangleBorder(
           borderRadius: BorderRadius.circular(radius),
         ),
-        elevation: 0
+        minimumSize: size,
+        elevation: 0,
       ),
       child: isLoading
           ? const SpinKitThreeBounce(color: Colors.white, size: 22)

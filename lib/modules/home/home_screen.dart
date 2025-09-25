@@ -45,8 +45,13 @@ class HomeScreen extends StatelessWidget {
                         child: AuthTextField(
                           controller: c.searchCTRL,
                           prefixIcon: const Icon(Icons.search),
+                          autofocus: true,
                           hintText: 'Search products',
                           textInputType: TextInputType.text,
+                          onTapOutside: (v) {
+                            final a = Get.find<InitHomeCtrl>();
+                            a.activeTab(0);
+                          },
                           textInputAction: TextInputAction.done,
                           onFieldSubmitted: (p0) {
                             c.searchParam(p0);
@@ -173,7 +178,10 @@ class HomeScreen extends StatelessWidget {
                                           }
                                         },
                                       ),
-                                      CustomListView(products: model.products),
+                                      CustomListView(
+                                        products: model.products,
+                                        categoryId: model.id,
+                                      ),
                                     ],
                                   );
                                 } else {
@@ -210,9 +218,10 @@ class HomeScreen extends StatelessWidget {
 
 class CustomListView extends StatelessWidget {
   final List<ProductModel> products;
+  final int categoryId;
   final HomeCtrl c = Get.find<HomeCtrl>();
 
-  CustomListView({super.key, required this.products});
+  CustomListView({super.key, required this.products, required this.categoryId});
 
   @override
   Widget build(BuildContext context) {
@@ -238,18 +247,22 @@ class CustomListView extends StatelessWidget {
                 a.activeTab(0);
                 Get.toNamed(
                   AppRoutes.productDetail,
-                  arguments: {'index': index, 'list': products},
+                  arguments: {
+                    'index': index,
+                    'list': products,
+                    'category': categoryId,
+                  },
                 );
               } else {
                 registerDialogue();
               }
             },
             child: Card(
+              elevation: 3,
               shape: RoundedRectangleBorder(
-                borderRadius: BorderRadiusGeometry.circular(12),
+                borderRadius: BorderRadius.circular(12),
               ),
               margin: EdgeInsets.zero,
-              elevation: 5,
               child: ClipRRect(
                 borderRadius: BorderRadius.circular(12),
                 child: CacheImage(
@@ -308,7 +321,7 @@ class CustomTitleRow extends StatelessWidget {
                 Rect.fromLTWH(0, 0, bounds.width, bounds.height),
               ),
               child: Text(
-                'See All',
+                'See more',
                 style: context.textTheme.bodySmall?.copyWith(
                   decoration: TextDecoration.underline,
                   decorationStyle: TextDecorationStyle.solid,

@@ -28,6 +28,7 @@ class MobileNoScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      resizeToAvoidBottomInset: true,
       body: Obx(() {
         if (c.initLoading()) {
           return const LoaderView();
@@ -65,7 +66,7 @@ class MobileNoScreen extends StatelessWidget {
                       textAlign: TextAlign.center,
                     ),
                   ),
-                  const SizedBox(height: 20),
+                  const SizedBox(height: 25),
                   FadeInUp(
                     delay: const Duration(milliseconds: 500),
                     child: Column(
@@ -107,7 +108,7 @@ class MobileNoScreen extends StatelessWidget {
                             ),
                           ],
                         ),
-                        const SizedBox(height: 20),
+                        const SizedBox(height: 25),
                         Text(
                           'Business Category',
                           style: context.textTheme.labelSmall?.copyWith(
@@ -129,74 +130,74 @@ class MobileNoScreen extends StatelessWidget {
                                 title: 'category',
                               ),
                         ),
-                        const SizedBox(height: 30),
-                        RichText(
-                          textAlign: TextAlign.center,
-                          text: TextSpan(
-                            style: context.textTheme.labelSmall?.copyWith(
-                              color: AppColors.textLight,
-                            ),
-                            children: [
-                              const TextSpan(
-                                text: 'By continuing, you agree to our ',
-                              ),
-                              TextSpan(
-                                text: 'Terms of Service',
-                                style: context.textTheme.labelSmall?.copyWith(
-                                  color: AppColors.lightPrimary,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: AppColors.lightPrimary,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    Get.to(
-                                      () => const WebViewScreen(
-                                        url: KeyConst.termsCondition,
-                                        title: 'Terms of Service',
-                                      ),
-                                    );
-                                  },
-                              ),
-                              TextSpan(
-                                text: ' and ',
-                                style: context.textTheme.labelSmall?.copyWith(
-                                  color: AppColors.textLight,
-                                ),
-                              ),
-                              TextSpan(
-                                text: 'Privacy Policy',
-                                style: context.textTheme.labelSmall?.copyWith(
-                                  color: AppColors.lightPrimary,
-                                  fontWeight: FontWeight.w500,
-                                  decoration: TextDecoration.underline,
-                                  decorationColor: AppColors.lightPrimary,
-                                ),
-                                recognizer: TapGestureRecognizer()
-                                  ..onTap = () {
-                                    Get.to(
-                                      () => const WebViewScreen(
-                                        url: KeyConst.privacyPolicy,
-                                        title: 'Privacy Policy',
-                                      ),
-                                    );
-                                  },
-                              ),
-                            ],
-                          ),
-                        ),
-                        const SizedBox(height: 15),
-                        Obx(() {
-                          return AuthElevatedButton(
-                            isLoading: c.gettingOTP(),
-                            title: 'Get Code',
-                            onPressed: () async {
-                              if (c.formKey.currentState?.validate() ?? false) {
-                                c.getOtp();
-                              }
-                            },
-                          );
-                        }),
+                        // const SizedBox(height: 30),
+                        // RichText(
+                        //   textAlign: TextAlign.center,
+                        //   text: TextSpan(
+                        //     style: context.textTheme.labelSmall?.copyWith(
+                        //       color: AppColors.textLight,
+                        //     ),
+                        //     children: [
+                        //       const TextSpan(
+                        //         text: 'By continuing, you agree to our ',
+                        //       ),
+                        //       TextSpan(
+                        //         text: 'Terms of Service',
+                        //         style: context.textTheme.labelSmall?.copyWith(
+                        //           color: AppColors.lightPrimary,
+                        //           fontWeight: FontWeight.w500,
+                        //           decoration: TextDecoration.underline,
+                        //           decorationColor: AppColors.lightPrimary,
+                        //         ),
+                        //         recognizer: TapGestureRecognizer()
+                        //           ..onTap = () {
+                        //             Get.to(
+                        //               () => const WebViewScreen(
+                        //                 url: KeyConst.termsCondition,
+                        //                 title: 'Terms of Service',
+                        //               ),
+                        //             );
+                        //           },
+                        //       ),
+                        //       TextSpan(
+                        //         text: ' and ',
+                        //         style: context.textTheme.labelSmall?.copyWith(
+                        //           color: AppColors.textLight,
+                        //         ),
+                        //       ),
+                        //       TextSpan(
+                        //         text: 'Privacy Policy',
+                        //         style: context.textTheme.labelSmall?.copyWith(
+                        //           color: AppColors.lightPrimary,
+                        //           fontWeight: FontWeight.w500,
+                        //           decoration: TextDecoration.underline,
+                        //           decorationColor: AppColors.lightPrimary,
+                        //         ),
+                        //         recognizer: TapGestureRecognizer()
+                        //           ..onTap = () {
+                        //             Get.to(
+                        //               () => const WebViewScreen(
+                        //                 url: KeyConst.privacyPolicy,
+                        //                 title: 'Privacy Policy',
+                        //               ),
+                        //             );
+                        //           },
+                        //       ),
+                        //     ],
+                        //   ),
+                        // ),
+                        // const SizedBox(height: 15),
+                        // Obx(() {
+                        //   return AuthElevatedButton(
+                        //     isLoading: c.gettingOTP(),
+                        //     title: 'Get Code',
+                        //     onPressed: () async {
+                        //       if (c.formKey.currentState?.validate() ?? false) {
+                        //         c.getOtp();
+                        //       }
+                        //     },
+                        //   );
+                        // }),
                       ],
                     ),
                   ),
@@ -206,6 +207,78 @@ class MobileNoScreen extends StatelessWidget {
           );
         }
       }),
+      bottomNavigationBar: SafeArea(
+        child: Padding(
+          padding: const EdgeInsets.all(20),
+          child: Column(
+            mainAxisSize: MainAxisSize.min,
+            children: [
+              const SizedBox(height: 15),
+              RichText(
+                textAlign: TextAlign.center,
+                text: TextSpan(
+                  style: context.textTheme.labelSmall?.copyWith(
+                    color: AppColors.textLight,
+                  ),
+                  children: [
+                    const TextSpan(text: 'By continuing, you agree to our '),
+                    TextSpan(
+                      text: 'Terms of Service',
+                      style: context.textTheme.labelSmall?.copyWith(
+                        color: AppColors.lightPrimary,
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColors.lightPrimary,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Get.to(
+                            () => const WebViewScreen(
+                              url: KeyConst.termsCondition,
+                              title: 'Terms of Service',
+                            ),
+                          );
+                        },
+                    ),
+                    const TextSpan(text: ' and '),
+                    TextSpan(
+                      text: 'Privacy Policy',
+                      style: context.textTheme.labelSmall?.copyWith(
+                        color: AppColors.lightPrimary,
+                        fontWeight: FontWeight.w500,
+                        decoration: TextDecoration.underline,
+                        decorationColor: AppColors.lightPrimary,
+                      ),
+                      recognizer: TapGestureRecognizer()
+                        ..onTap = () {
+                          Get.to(
+                            () => const WebViewScreen(
+                              url: KeyConst.privacyPolicy,
+                              title: 'Privacy Policy',
+                            ),
+                          );
+                        },
+                    ),
+                  ],
+                ),
+              ),
+              const SizedBox(height: 30),
+              Obx(() {
+                return AuthElevatedButton(
+                  size: Size(context.width, 30),
+                  isLoading: c.gettingOTP(),
+                  title: 'Get Code',
+                  onPressed: () async {
+                    if (c.formKey.currentState?.validate() ?? false) {
+                      c.getOtp();
+                    }
+                  },
+                );
+              }),
+            ],
+          ),
+        ),
+      ),
     );
   }
 }

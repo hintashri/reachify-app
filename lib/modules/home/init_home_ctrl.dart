@@ -20,6 +20,9 @@ class InitHomeCtrl extends GetxController
   static const Offset hiddenOffset = Offset(0.0, 1.0);
   static const Offset visibleOffset = Offset(0.0, 0.0);
 
+  // Track last scroll position to detect scroll direction
+  double _lastScrollPosition = 0.0;
+
   @override
   void onInit() {
     super.onInit();
@@ -46,36 +49,6 @@ class InitHomeCtrl extends GetxController
     animationController.value = 1.0;
   }
 
-  // Handle scroll notifications from ANY scrollable widget
-  // bool handleScrollNotification(ScrollNotification notification) {
-  //   if (notification is ScrollUpdateNotification) {
-  //     final scrollDelta = notification.scrollDelta ?? 0;
-  //
-  //     // Mark that user has started scrolling
-  //     if (!hasUserScrolled.value && scrollDelta.abs() > 0) {
-  //       hasUserScrolled.value = true;
-  //     }
-  //
-  //     // Always show navbar when at the top of ANY scroll view
-  //     if (notification.metrics.pixels <= 0) {
-  //       _showNavBar();
-  //       return false;
-  //     }
-  //
-  //     // Only animate if user has scrolled before and delta is significant
-  //     if (hasUserScrolled.value && scrollDelta.abs() > scrollThreshold) {
-  //       if (scrollDelta > 0 && isNavBarVisible.value) {
-  //         _hideNavBar();
-  //       } else if (scrollDelta < 0 && !isNavBarVisible.value) {
-  //         _showNavBar();
-  //       }
-  //     }
-  //   }
-  //
-  //   // Return false to allow the notification to continue bubbling up
-  //   return false;
-  // }
-
   bool handleScrollNotification(ScrollNotification notification) {
     // Ignore horizontal scrolling (carousel, horizontal listviews, etc.)
     if (notification.metrics.axis == Axis.horizontal) {
@@ -84,24 +57,44 @@ class InitHomeCtrl extends GetxController
 
     if (notification is ScrollUpdateNotification) {
       final scrollDelta = notification.scrollDelta ?? 0;
+      final currentPosition = notification.metrics.pixels;
 
+      // Mark that user has started scrolling
       if (!hasUserScrolled.value && scrollDelta.abs() > 0) {
         hasUserScrolled.value = true;
       }
 
-      if (notification.metrics.pixels <= 0) {
+      // ALWAYS show navbar when at the top (pixels <= 0)
+      if (currentPosition <= 0) {
         _showNavBar();
+        _lastScrollPosition = currentPosition;
         return false;
       }
 
+      // Only proceed with hide/show logic if user has scrolled and delta is significant
       if (hasUserScrolled.value && scrollDelta.abs() > scrollThreshold) {
+        // Scrolling down (positive delta) - hide navbar
         if (scrollDelta > 0 && isNavBarVisible.value) {
           _hideNavBar();
-        } else if (scrollDelta < 0 && !isNavBarVisible.value) {
+        }
+        // Scrolling up (negative delta) - show navbar
+        else if (scrollDelta < 0 && !isNavBarVisible.value) {
           _showNavBar();
         }
       }
+
+      _lastScrollPosition = currentPosition;
     }
+    // Handle scroll end - show navbar if user reaches the top
+    else if (notification is ScrollEndNotification) {
+      final currentPosition = notification.metrics.pixels;
+
+      // If scroll ended at or near the top, ensure navbar is visible
+      if (currentPosition <= 0) {
+        _showNavBar();
+      }
+    }
+
     return false;
   }
 
@@ -117,6 +110,16 @@ class InitHomeCtrl extends GetxController
       isNavBarVisible.value = true;
       animationController.forward();
     }
+  }
+
+  // Method to manually show navbar (can be called from outside)
+  void showNavBar() {
+    _showNavBar();
+  }
+
+  // Method to manually hide navbar (can be called from outside)
+  void hideNavBar() {
+    _hideNavBar();
   }
 
   @override

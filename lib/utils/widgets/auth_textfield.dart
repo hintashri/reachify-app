@@ -14,7 +14,9 @@ class AuthTextField extends StatelessWidget {
   final List<TextInputFormatter>? inputFormatters;
   final FormFieldSetter<String>? onChange;
   final double radius;
+  final bool autofocus;
   final void Function(String)? onFieldSubmitted;
+  final void Function(PointerDownEvent)? onTapOutside;
 
   const AuthTextField({
     super.key,
@@ -25,8 +27,10 @@ class AuthTextField extends StatelessWidget {
     this.inputFormatters,
     this.controller,
     this.validator,
+    this.autofocus = false,
     this.onChange,
     this.onFieldSubmitted,
+    this.onTapOutside,
     this.radius = 10,
     required this.hintText,
   });
@@ -34,12 +38,14 @@ class AuthTextField extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return TextFormField(
-      onTapOutside: (event) => FocusScope.of(context).unfocus(),
+      onTapOutside: onTapOutside ?? (event) => FocusScope.of(context).unfocus(),
       controller: controller,
       onFieldSubmitted: onFieldSubmitted,
       style: context.textTheme.labelMedium,
       validator: validator,
+
       inputFormatters: inputFormatters,
+      autofocus: autofocus,
       keyboardType: textInputType,
       textInputAction: textInputAction,
       onChanged: onChange,
@@ -47,7 +53,10 @@ class AuthTextField extends StatelessWidget {
       decoration: InputDecoration(
         prefixIcon: prefixIcon,
         suffixIcon: suffixIcon,
-        contentPadding: const EdgeInsets.symmetric(horizontal: 14),
+        contentPadding: const EdgeInsets.symmetric(
+          horizontal: 14,
+          vertical: 16,
+        ),
         hintText: hintText,
         hintStyle: context.textTheme.labelMedium?.copyWith(
           color: AppColors.borderColor,

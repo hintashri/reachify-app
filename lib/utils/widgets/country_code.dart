@@ -61,7 +61,7 @@ class CountryCodePickerState extends State<CountryCodePicker> {
           border: Border.all(color: AppColors.borderColor),
         ),
         alignment: Alignment.center,
-        padding: const EdgeInsets.fromLTRB(10, 10, 5, 10),
+        padding: const EdgeInsets.fromLTRB(10, 12, 5, 12),
         child: Row(
           children: [
             Text(

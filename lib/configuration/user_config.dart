@@ -53,6 +53,16 @@ class UserConfig {
     Get.offAllNamed(AppRoutes.mobileNoScreen);
   }
 
+  Future<void> deleteUser() async {
+    final res = await deleteUserApi();
+    if (res) {
+      appUser.value = UserModel();
+      net.init(token: '');
+      await prefs.removeValue(key: KeyConst.userKey);
+      Get.offAllNamed(AppRoutes.mobileNoScreen);
+    }
+  }
+
   Future<UserModel> getUserFromApi() async {
     try {
       final response = await net.get(url: UrlConst.getUser, params: {});
@@ -68,6 +78,22 @@ class UserConfig {
     } catch (e, t) {
       logger.e('$e\n$t');
       return UserModel();
+    }
+  }
+
+  Future<bool> deleteUserApi() async {
+    try {
+      final response = await net.get(url: UrlConst().deleteAccount, params: {});
+      if (net.successfulRes(response: response)) {
+        logger.d('Delete User successfully');
+        return true;
+      } else {
+        AppFunc.showSnackBar(message: response.message);
+        return false;
+      }
+    } catch (e, t) {
+      logger.e('$e\n$t');
+      return false;
     }
   }
 

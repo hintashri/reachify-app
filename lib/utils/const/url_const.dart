@@ -1,3 +1,5 @@
+import 'package:reachify_app/configuration/user_config.dart';
+
 class UrlConst {
   static const baseUrl = 'https://admin.reachifymedia.com';
 
@@ -15,7 +17,9 @@ class UrlConst {
   /// USER
   static const getUser = '$baseUrl/api/v1/customer/info';
   static const updateUser = '$baseUrl/api/v1/customer/update-profile';
-  static const deleteAccount = '$baseUrl/';
+
+  String get deleteAccount =>
+      '$baseUrl/api/v1/customer/account-delete/${user.userId}';
 
   //   HOME GETS
   static const getBanners = '$baseUrl/api/v1/banners';

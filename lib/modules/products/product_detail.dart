@@ -1,8 +1,8 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:get/get.dart';
 import 'package:like_button/like_button.dart';
-import 'package:photo_view/photo_view.dart';
+import 'package:pinch_zoom/pinch_zoom.dart';
+import 'package:reachify_app/configuration/network_config.dart';
 import 'package:reachify_app/models/product_model.dart';
 import 'package:reachify_app/modules/home/home_ctrl.dart';
 import 'package:reachify_app/modules/products/wishlist_ctrl.dart';
@@ -17,6 +17,8 @@ import 'package:reachify_app/utils/widgets/cache_image.dart';
 import 'package:reachify_app/utils/widgets/svg_image.dart';
 import 'package:scrollable_positioned_list/scrollable_positioned_list.dart';
 
+import '../../utils/const/logger.dart';
+
 class ProductDetailScreen extends StatefulWidget {
   const ProductDetailScreen({super.key});
 
@@ -25,8 +27,8 @@ class ProductDetailScreen extends StatefulWidget {
 }
 
 class _ProductDetailScreenState extends State<ProductDetailScreen> {
-  final int index = Get.arguments['index'];
-  final List<ProductModel> list = Get.arguments['list'];
+  int index = 0;
+  RxList<ProductModel> list = <ProductModel>[].obs;
 
   final ItemScrollController itemScrollController = ItemScrollController();
   final ItemPositionsListener itemPositionsListener =
@@ -39,9 +41,47 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
   @override
   void initState() {
     super.initState();
-
+    getData();
     // Listen to scroll position changes
+  }
+
+  Future<void> getData() async {
+    index = Get.arguments['index'];
+    list.value = Get.arguments['list'];
+    logger.d(Get.arguments);
     itemPositionsListener.itemPositions.addListener(_onScrollChanged);
+    final catId = Get.arguments['category'];
+    if (catId != null && catId is int && catId != 0) {
+      await getProducts(categoryId: catId);
+    }
+  }
+
+  Future<void> getProducts({
+    required int categoryId,
+    bool showLoader = true,
+  }) async {
+    try {
+      final response = await net.post(
+        url: UrlConst.getProducts,
+        params: {'id': categoryId},
+      );
+      if (net.successfulRes(response: response)) {
+        final List<dynamic> data = response.data;
+        final List<ProductModel> elements = data
+            .map((json) => ProductModel.fromJson(json))
+            .toList();
+        final existingIds = list.map((e) => e.id).toSet();
+
+        final newItems = elements.where((e) => !existingIds.contains(e.id));
+        logger.d('New List Count :${newItems.length}');
+        list.addAll(newItems);
+        list.refresh();
+      } else {
+        logger.e(response);
+      }
+    } catch (e, t) {
+      logger.e('$e\n$t');
+    }
   }
 
   void _onScrollChanged() {
@@ -99,18 +139,20 @@ class _ProductDetailScreenState extends State<ProductDetailScreen> {
       body: SafeArea(
         child: Stack(
           children: [
-            ScrollablePositionedList.builder(
-              initialScrollIndex: index,
-              itemCount: list.length,
-              itemScrollController: itemScrollController,
-              itemPositionsListener: itemPositionsListener,
-              padding: EdgeInsets.only(
-                top: _isAppBarVisible ? kToolbarHeight : 0,
-              ),
-              itemBuilder: (context, index) {
-                return ProductDetailCard(model: list[index]);
-              },
-            ),
+            Obx(() {
+              return ScrollablePositionedList.builder(
+                initialScrollIndex: index,
+                itemCount: list.length,
+                itemScrollController: itemScrollController,
+                itemPositionsListener: itemPositionsListener,
+                padding: EdgeInsets.only(
+                  top: _isAppBarVisible ? kToolbarHeight : 0,
+                ),
+                itemBuilder: (context, index) {
+                  return ProductDetailCard(model: list[index]);
+                },
+              );
+            }),
             // Floating App Bar
             AnimatedPositioned(
               duration: const Duration(milliseconds: 200),
@@ -167,17 +209,12 @@ class ProductDetailCard extends StatelessWidget {
                 borderRadius: BorderRadius.circular(12),
               ),
               margin: EdgeInsets.zero,
-              child: GestureDetector(
-                onTap: () {
-                  Get.to(
-                    () => ProductImageDetailPage(imageUrl: imageUrl),
-                    transition: Transition.noTransition,
-                  );
-                },
-                child: Hero(
-                  tag: imageUrl,
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(12),
+              child: Hero(
+                tag: imageUrl,
+                child: ClipRRect(
+                  borderRadius: BorderRadius.circular(12),
+                  child: PinchZoom(
+                    maxScale: 2.5,
                     child: CacheImage(
                       aspectRatio: 1,
                       url:
@@ -238,66 +275,6 @@ class ProductDetailCard extends StatelessWidget {
               ],
             ),
           ],
-        ),
-      ),
-    );
-  }
-}
-
-class ProductImageDetailPage extends StatefulWidget {
-  final String imageUrl;
-
-  const ProductImageDetailPage({super.key, required this.imageUrl});
-
-  @override
-  State<ProductImageDetailPage> createState() => _ProductImageDetailPageState();
-}
-
-class _ProductImageDetailPageState extends State<ProductImageDetailPage> {
-  final PhotoViewController _photoController = PhotoViewController();
-  bool _showPhotoView = true; // we will toggle this before popping
-
-  Future<void> _handleBack(BuildContext context) async {
-    if (_photoController.scale != 1.0) {
-      // ✅ Hide PhotoView first so Hero sees it in its original state
-      setState(() => _showPhotoView = false);
-
-      // wait one frame so widget tree updates before pop
-      await Future.delayed(const Duration(milliseconds: 16));
-    }
-
-    Get.back(); // now hero animates from contained state
-  }
-
-  @override
-  Widget build(BuildContext context) {
-    return Scaffold(
-      backgroundColor: Colors.black,
-      extendBodyBehindAppBar: true,
-      appBar: AppBar(
-        backgroundColor: Colors.transparent,
-        elevation: 0,
-        leading: AppBackButton(onPressed: () => _handleBack(context)),
-      ),
-      body: Center(
-        child: Hero(
-          tag: widget.imageUrl,
-          child: _showPhotoView
-              ? PhotoView(
-                  controller: _photoController,
-                  imageProvider: CachedNetworkImageProvider(widget.imageUrl),
-                  backgroundDecoration: const BoxDecoration(
-                    color: Colors.transparent,
-                  ),
-                  minScale: PhotoViewComputedScale.contained,
-                  maxScale: PhotoViewComputedScale.covered * 3.0,
-                  initialScale: PhotoViewComputedScale.contained,
-                  enableRotation: false,
-                )
-              : Image(
-                  image: CachedNetworkImageProvider(widget.imageUrl),
-                  fit: BoxFit.contain,
-                ),
         ),
       ),
     );
